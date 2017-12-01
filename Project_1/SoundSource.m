@@ -77,7 +77,7 @@ classdef SoundSource
                     xlabel('f, Hz'); ylabel('SPL, dB/m/W'); grid on; title('Sensitivity');
                     
                 case 'amplitudeRP'
-                    if (numel(obj.amplitudeRP) ~= 360*360) || (~isreal(obj.amplitudeRP))
+                    if (numel(obj.amplitudeRP) ~= 360*360*32) || (~isreal(obj.amplitudeRP))
                         error('Enter values of amplitude RP for all angles from 1 to 360 in two dimensionals/n(you must enter matrix with size 360x360)');
                     end
                     
@@ -90,7 +90,7 @@ classdef SoundSource
                     shading interp;
                     
                 case 'phaseRP'
-                    if (numel(obj.phaseRP) ~= 360*360) || (~isreal(obj.phaseRP))
+                    if (numel(obj.phaseRP) ~= 360*360*32) || (~isreal(obj.phaseRP))
                         error('Enter values of phase RP for all angles from 1 to 360 in two dimensionals/n(you must enter matrix with size 360x360)');
                     end
                     
