@@ -32,7 +32,7 @@ classdef Source
            end
            
            obj.SSobj = load(SSfile);
-           obj.position = posiiton;
+           obj.position = position;
            obj.K = K;
         end
     end

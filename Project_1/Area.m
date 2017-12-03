@@ -46,8 +46,14 @@ classdef Area < handle
         
         %% add Sources method
         function obj = addSource(obj, source)
-            if nargin < 2
-                eroor('Enter name of source object');
+            if (nargin < 2) || (~isa(source, 'Source'))
+                eroor('Enter name of Source object');
+            end
+            if source.position(1) > obj.xSize
+                error('X position of source is out of boundaries. Source position must be inside of area');
+            end
+            if source.position(2) > obj.ySize
+                error('Y position of source is out of boundaries. Source position must be inside of area');
             end
             
             emptyCells = find(cellfun('isempty', obj.Sources), 1, 'first');
@@ -55,9 +61,15 @@ classdef Area < handle
         end
         
         %% add Recievers method
-        function obj = addRecievers(obj, source)
-            if nargin < 2
-                eroor('Enter name of reciever object');
+        function obj = addRecievers(obj, reciever)
+            if (nargin < 2) || (~isa(reciever, 'Reciever'))
+                eroor('Enter name of Reciever object');
+            end
+            if reciever.position(1) > obj.xSize
+                error('X position of reciever is out of boundaries. Reciever position must be inside of area');
+            end
+            if reciever.position(2) > obj.ySize
+                error('Y position of reciever is out of boundaries. Reciever position must be inside of area');
             end
             
             emptyCells = find(cellfun('isempty', obj.Recievers), 1, 'first');
