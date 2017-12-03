@@ -32,6 +32,6 @@ alpha = 1.24e-11*source.SSobj.f(freq_idx)^2; % air absorbtion coef.
 A = source.SSobj.sensitivity(freq_idx) + source.K - 20*log10(r) + source.SSobj.amplitudeRP(phi, theta) - 20*alpha*r*log10(exp(1)); % amplitude value of preasure in dB
 Psi = 2*pi*source.SSobj.f(freq_idx) * (r/c0 + tau) + source.SSobj.phaseRP(phi, theta); % phase of preasure in rad
 
-
+% p = A*exp(-j*Psi)
 end
 

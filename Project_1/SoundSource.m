@@ -24,7 +24,7 @@ classdef SoundSource
     
     properties
         name;
-        size = [0.5 0.5 0.5];
+        sizes = [0.5 0.5 0.5];
         weight = 15;
         additInfo = cell(1,10);
         impedance;
@@ -83,8 +83,8 @@ classdef SoundSource
                     if nargin < 3 || isempty(find(obj.f == freq, 1))
                         error('Enter valid frequency for RP visualization');
                     end
-                    if (numel(obj.amplitudeRP) ~= 360*360*32) || (~isreal(obj.amplitudeRP))
-                        error('Enter values of amplitude RP for all angles from 1 to 360 in two dimensionals/n(you must enter matrix with size 360x360)');
+                    if (sum(size(obj.amplitudeRP) == [360 360 32]) ~= 3) || (~isreal(obj.amplitudeRP))
+                        error('Enter values of amplitude RP for all angles from 1 to 360 in two dimensionals (you must enter tensor with size 360x360x32)');
                     end
                     
                     
@@ -92,24 +92,26 @@ classdef SoundSource
                     Phi = linspace(0, pi*2, 360);
                     Theta = linspace(0, pi*2, 360);
                     [Phi, Theta] = meshgrid(Phi, Theta);
-                    [X, Y, Z] = sph2cart(Theta, Phi, obj.amplitudeRP(find(obj.f == freq, 1)));
+                    [X, Y, Z] = sph2cart(Theta, Phi, obj.amplitudeRP(:,:,find(obj.f == freq, 1)));
                     surf(X,Y,Z);
+                    xlabel('x'); ylabel('y'); zlabel('z');
                     shading interp;
                     
                 case 'phaseRP'
                     if nargin < 3 || isempty(find(obj.f == freq, 1))
                         error('Enter valid frequency for RP visualization');
                     end
-                    if (numel(obj.phaseRP) ~= 360*360*32) || (~isreal(obj.phaseRP))
-                        error('Enter values of phase RP for all angles from 1 to 360 in two dimensionals/n(you must enter matrix with size 360x360)');
+                    if (sum(size(obj.phaseRP) == [360 360 32]) ~= 3) || (~isreal(obj.phaseRP))
+                        error('Enter values of phase RP for all angles from 1 to 360 in two dimensionals (you must enter tensor with size 360x360x32)');
                     end
                     
                     figure();
                     Phi = linspace(0, pi*2, 360);
                     Theta = linspace(0, pi*2, 360);
                     [Phi, Theta] = meshgrid(Phi, Theta);
-                    [X, Y, Z] = sph2cart(Theta, Phi, obj.phaseRP(find(obj.f == freq, 1)));
+                    [X, Y, Z] = sph2cart(Theta, Phi, obj.phaseRP(:,:,find(obj.f == freq, 1)));
                     surf(X,Y,Z);
+                    xlabel('x'); ylabel('y'); zlabel('z');
                     shading interp;
                     
                 otherwise
@@ -129,10 +131,10 @@ classdef SoundSource
             end
             sourceData.name = obj.name;
             
-            if (numel(obj.size) ~= 3) || (~isempty(find(obj.size <= 0, 1))) || (~isreal(obj.size))
-                error('Sound source size is not a valid value');
+            if (numel(obj.sizes) ~= 3) || (~isempty(find(obj.sizes <= 0, 1))) || (~isreal(obj.sizes))
+                error('Sound source sizes is not a valid value');
             end
-            sourceData.size = obj.size;
+            sourceData.sizes = obj.sizes;
             
             if (numel(obj.weight) ~= 1) || (obj.weight <= 0) || (~isreal(obj.weight))
                 error('Sound source weight is not a valid value');
@@ -149,13 +151,13 @@ classdef SoundSource
             end
             sourceData.sensitivity = obj.sensitivity;
             
-            if (numel(obj.amplitudeRP) ~= 360*360) || (~isreal(obj.amplitudeRP))
-                error('Sound source amplitude RP is not a valid value');
+            if (sum(size(obj.amplitudeRP) == [360 360 32]) ~= 3) || (~isreal(obj.amplitudeRP))
+                error('Sound source amplitude RP is not a valid value (you must enter tensor with size 360x360x32 of real numbers)');
             end
             sourceData.amplitudeRP = obj.amplitudeRP;
             
-            if (numel(obj.phaseRP) ~= 360*360) || (~isreal(obj.phaseRP))
-                error('Sound source phase RP is not a valid value');
+            if (sum(size(obj.phaseRP) == [360 360 32]) ~= 3) || (~isreal(obj.phaseRP))
+                error('Sound source phase RP is not a valid value (you must enter tensor with size 360x360x32 of real numbers)');
             end
             sourceData.phaseRP = obj.phaseRP;
             
