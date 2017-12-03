@@ -44,9 +44,12 @@ classdef SoundSource
         end
         
         %% method for visualization of some properties      
-        function visualize(obj, prop)
-            if nargin ~= 2
+        function visualize(obj, prop, freq)
+            if nargin < 2
                 error('Enter name of parameter for visualization');
+            end
+            if nargin < 3
+                freq = 0;
             end
             
             switch prop
@@ -77,19 +80,26 @@ classdef SoundSource
                     xlabel('f, Hz'); ylabel('SPL, dB/m/W'); grid on; title('Sensitivity');
                     
                 case 'amplitudeRP'
+                    if nargin < 3 || isempty(find(obj.f == freq, 1))
+                        error('Enter valid frequency for RP visualization');
+                    end
                     if (numel(obj.amplitudeRP) ~= 360*360*32) || (~isreal(obj.amplitudeRP))
                         error('Enter values of amplitude RP for all angles from 1 to 360 in two dimensionals/n(you must enter matrix with size 360x360)');
                     end
+                    
                     
                     figure();
                     Phi = linspace(0, pi*2, 360);
                     Theta = linspace(0, pi*2, 360);
                     [Phi, Theta] = meshgrid(Phi, Theta);
-                    [X, Y, Z] = sph2cart(Theta, Phi, obj.amplitudeRP);
+                    [X, Y, Z] = sph2cart(Theta, Phi, obj.amplitudeRP(find(obj.f == freq, 1)));
                     surf(X,Y,Z);
                     shading interp;
                     
                 case 'phaseRP'
+                    if nargin < 3 || isempty(find(obj.f == freq, 1))
+                        error('Enter valid frequency for RP visualization');
+                    end
                     if (numel(obj.phaseRP) ~= 360*360*32) || (~isreal(obj.phaseRP))
                         error('Enter values of phase RP for all angles from 1 to 360 in two dimensionals/n(you must enter matrix with size 360x360)');
                     end
@@ -98,7 +108,7 @@ classdef SoundSource
                     Phi = linspace(0, pi*2, 360);
                     Theta = linspace(0, pi*2, 360);
                     [Phi, Theta] = meshgrid(Phi, Theta);
-                    [X, Y, Z] = sph2cart(Theta, Phi, obj.phaseRP);
+                    [X, Y, Z] = sph2cart(Theta, Phi, obj.phaseRP(find(obj.f == freq, 1)));
                     surf(X,Y,Z);
                     shading interp;
                     
