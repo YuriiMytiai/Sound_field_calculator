@@ -161,6 +161,8 @@ classdef SoundSource
             end
             sourceData.phaseRP = obj.phaseRP;
             
+            sourceData.freqs = obj.f;
+            
             if ~isempty(obj.additInfo)
                 obj.additInfo{1,1} = ['Last modified ',datestr(datetime('now'))];
                 sourceData.additInfo = obj.additInfo;
