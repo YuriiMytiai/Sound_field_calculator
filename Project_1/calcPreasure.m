@@ -23,8 +23,9 @@ r = sqrt(xRS*xRS + yRS*yRS + zRS*zRS); % distance from source to reciever
 thetaRS = round(acosd(zRS/r)); % nearest integer
 phiRS = round(atan2d(yRS, xRS)); % nearest integer in range [-180 180]
 
-theta = thetaRS + round(source.theta0) + 1; % include rotation in two dimensionals
-phi = phiRS + round(source.phi0) + 1; % + 1 cause matlab indexes start from 1;
+theta = thetaRS + round(source.theta0); % include rotation in two dimensionals
+phi = phiRS + round(source.phi0); 
+
 if phi > 359
     phi = phi - 359;
 end
@@ -38,6 +39,8 @@ if theta < 0
     theta = 359 + theta; % change range to [0 360]
 end
 
+phi = phi + 1; % + 1 cause matlab indexes start from 1;
+theta = theta + 1;
 
 alpha = 1.24e-11 * sourceData.freqs(freq_idx)^2; % air absorbtion coef.
 
