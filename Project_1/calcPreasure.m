@@ -22,17 +22,27 @@ zRS = zR - zS;
 r = sqrt(xRS*xRS + yRS*yRS + zRS*zRS); % distance from source to reciever
 thetaRS = round(acosd(zRS/r)); % nearest integer
 phiRS = round(atan2d(yRS, xRS)); % nearest integer in range [-180 180]
-if phiRS < 0
-    phiRS = 360 + phiRS; % change range to [0 360]
+
+theta = thetaRS + round(source.theta0) + 1; % include rotation in two dimensionals
+phi = phiRS + round(source.phi0) + 1; % + 1 cause matlab indexes start from 1;
+if phi > 359
+    phi = phi - 359;
+end
+if phi < 0
+    phi = 359 + phi; % change range to [0 360]
+end
+if theta > 359
+    theta = theta - 359;
+end
+if theta < 0
+    theta = 359 + theta; % change range to [0 360]
 end
 
-theta = thetaRS + round(source.theta0); % include rotation in two dimensionals
-phi = phiRS + round(source.phi0);
 
 alpha = 1.24e-11 * sourceData.freqs(freq_idx)^2; % air absorbtion coef.
 
-A = sourceData.sensitivity(freq_idx) + source.K - 20*log10(r) + sourceData.amplitudeRP(phi, theta) - 20*alpha*r*log10(exp(1)); % amplitude value of preasure in dB
-Psi = 2*pi*sourceData.freqs(freq_idx) * (r/c0 + source.tau) + sourceData.phaseRP(phi, theta); % phase of preasure in rad
+A = sourceData.sensitivity(freq_idx) + source.K - 20*log10(r) + sourceData.amplitudeRP(phi, theta, freq_idx) - 20*alpha*r*log10(exp(1)); % amplitude value of preasure in dB
+Psi = 2*pi*sourceData.freqs(freq_idx) * (r/c0 + source.tau0) + sourceData.phaseRP(phi, theta, freq_idx); % phase of preasure in rad
 
 % p = A*exp(-j*Psi)
 end

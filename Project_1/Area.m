@@ -27,13 +27,13 @@ classdef Area < handle
             obj.xStep = xStep;
             obj.yStep = yStep;
             
-            numXpoints = xSize / xStep;
+            numXpoints = xSize / xStep + 1;
             if mod(numXpoints, 1) ~= 0
                 numXpoints = numXpoints + 1;
                 obj.xStep = obj.xSize / numXpoints;
             end
             
-            numYpoints = ySize / yStep;
+            numYpoints = ySize / yStep + 1;
             if mod(numYpoints, 1) ~= 0
                 numYpoints = numYpoints + 1;
                 obj.yStep = obj.ySize / numYpoints;
@@ -41,7 +41,9 @@ classdef Area < handle
             
             xPoints = linspace(0, obj.xSize, numXpoints);
             yPoints = linspace(0, obj.ySize, numYpoints);
-            obj.grid = xPoints' * yPoints;
+            [X, Y] = meshgrid(xPoints, yPoints);
+            obj.grid.X = X;
+            obj.grid.Y = Y;
         end
         
         %% add Sources method
