@@ -24,13 +24,18 @@ classdef SoundSource < handle
     
     properties
         name;
-        sizes = [0.5 0.5 0.5];
+        %sizes = [0.5 0.5 0.5];
         weight = 15;
         additInfo = cell(1,10);
         impedance;
         sensitivity;
         amplitudeRP;
         phaseRP;
+        CP = [0.25 0.5 0.25];
+    end
+    
+    properties (SetObservable)
+        sizes = [0.5 0.5 0.5];
     end
     
     methods
@@ -41,6 +46,8 @@ classdef SoundSource < handle
             else
                 obj.name = name;
             end
+            
+            addlistener(obj, 'sizes', 'PostSet', @(src,eventData)obj.chngCP);
         end
         
         %% method for visualization of some properties      
@@ -87,16 +94,41 @@ classdef SoundSource < handle
                         error('Enter values of amplitude RP for all angles from 1 to 360 in two dimensionals (you must enter tensor with size 360x360x32)');
                     end
                     
-                    
                     figure();
+                    visualizeGroup = hggroup;
                     Phi = linspace(0, pi*2, 360);
                     Theta = linspace(0, pi*2, 360);
                     [Phi, Theta] = meshgrid(Phi, Theta);
-                    [X, Y, Z] = sph2cart(Theta, Phi, obj.amplitudeRP(:,:,find(obj.f == freq, 1)));
-                    surf(X,Y,Z);
-                    xlabel('x'); ylabel('y'); zlabel('z');
-                    shading interp;
+                    RP = obj.amplitudeRP(:,:,find(obj.f == freq, 1));
+                    RP = RP - min(min(RP)); % we can't use negative values for plotting
+                    RP = RP ./ max(max(RP)) .* (min(obj.sizes)/2); % normalization to min size of box
                     
+                    Xx = obj.sizes(1);
+                    Yy = obj.sizes(2);
+                    Zz = obj.sizes(3);
+                    x = [0 Xx Xx 0 0 Xx Xx 0];
+                    y = [0 0 Yy Yy 0 0 Yy Yy] ;
+                    z = x'*x*(y')*y/Yy^2/Xx^2*Zz/2;
+                    h1 = surf(x, y, z, ones(size(z)), 'Parent', visualizeGroup);
+                    alpha(h1, 0.2);
+                    hold on;
+                    axis equal;
+                    
+                    [X, Y, Z] = sph2cart(Theta, Phi, RP);
+                    X = X + obj.CP(1);
+                    Y = Y + obj.CP(2);
+                    Z = Z + obj.CP(3);
+                    h2 = surf(X, Y, Z, 'Parent', visualizeGroup);
+                    alpha(h2, 1);
+                    %shading(h2, 'interp');
+                    h2.EdgeColor = 'none';
+                    
+                    xlabel('x, m'); ylabel('y, m'); zlabel('z, m');
+                    %shading interp;
+                    hold off;
+                    view([120 25]);
+                    
+                    obj.additInfo{1,2} = visualizeGroup;
                 case 'phaseRP'
                     if nargin < 3 || isempty(find(obj.f == freq, 1))
                         error('Enter valid frequency for RP visualization');
@@ -166,16 +198,22 @@ classdef SoundSource < handle
             save(fileName, 'obj');
         end
         
-        %% rotate method
-        function upend(obj)
-            zOld = obj.sizes(3);
-            xOld = obj.sizes(1);
-            obj.sizes(1) = zOld;
-            obj.sizes(3) = xOld;
-            obj.amplitudeRP = permute(obj.amplitudeRP, [2 1 3]);
-            obj.phaseRP = permute(obj.phaseRP, [2 1 3]);
+%         %% rotate method
+%         function upend(obj)
+%             zOld = obj.sizes(3);
+%             xOld = obj.sizes(1);
+%             obj.sizes(1) = zOld;
+%             obj.sizes(3) = xOld;
+%             obj.amplitudeRP = permute(obj.amplitudeRP, [2 1 3]);
+%             obj.phaseRP = permute(obj.phaseRP, [2 1 3]);
+%         end
+        
+        %% calculation of Central Point
+        function chngCP(obj)
+            obj.CP = obj.sizes .* [0.5 1 0.5];
         end
+        
     end
-    
+     
 end
 
