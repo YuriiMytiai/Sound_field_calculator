@@ -31,7 +31,12 @@ classdef Source
                error('Amplification coefficient is not a valid value');
            end
            
-           obj.SSobj = load(SSfile);
+           loadedObj = load(SSfile);
+           if ~isa(loadedObj.obj, 'SoundSource')
+               error('Selected file is not a SoundSource object');
+           end
+           
+           obj.SSobj = loadedObj.obj;
            obj.position = position;
            obj.K = K;
         end

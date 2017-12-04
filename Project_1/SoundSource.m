@@ -129,43 +129,33 @@ classdef SoundSource
                     || isempty(obj.phaseRP)
                 eroor('Fill in all values of sound source properties');
             end
-            sourceData.name = obj.name;
             
             if (numel(obj.sizes) ~= 3) || (~isempty(find(obj.sizes <= 0, 1))) || (~isreal(obj.sizes))
                 error('Sound source sizes is not a valid value');
             end
-            sourceData.sizes = obj.sizes;
             
             if (numel(obj.weight) ~= 1) || (obj.weight <= 0) || (~isreal(obj.weight))
                 error('Sound source weight is not a valid value');
             end
-            sourceData.weight = obj.weight;
             
             if numel(obj.impedance) ~= length(obj.f)
                 error('Sound source impedance is not a valid value');
             end
-            sourceData.impedance = obj.impedance;
             
             if numel(obj.sensitivity) ~= length(obj.f)
                 error('Sound source sensitivity is not a valid value');
             end
-            sourceData.sensitivity = obj.sensitivity;
             
             if (sum(size(obj.amplitudeRP) == [360 360 32]) ~= 3) || (~isreal(obj.amplitudeRP))
                 error('Sound source amplitude RP is not a valid value (you must enter tensor with size 360x360x32 of real numbers)');
             end
-            sourceData.amplitudeRP = obj.amplitudeRP;
             
             if (sum(size(obj.phaseRP) == [360 360 32]) ~= 3) || (~isreal(obj.phaseRP))
                 error('Sound source phase RP is not a valid value (you must enter tensor with size 360x360x32 of real numbers)');
             end
-            sourceData.phaseRP = obj.phaseRP;
-            
-            sourceData.freqs = obj.f;
             
             if ~isempty(obj.additInfo)
                 obj.additInfo{1,1} = ['Last modified ',datestr(datetime('now'))];
-                sourceData.additInfo = obj.additInfo;
             end
 
             
@@ -173,7 +163,7 @@ classdef SoundSource
                 mkdir(filePath);
             end
             fileName = fullfile(filePath,[obj.name,'.mat']);
-            save(fileName, 'sourceData');
+            save(fileName, 'obj');
         end
     end
     
