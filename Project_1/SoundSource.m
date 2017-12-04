@@ -1,4 +1,4 @@
-classdef SoundSource
+classdef SoundSource < handle
     %SoundSource is class with information about sound source
     
     %   create new object using constructor (needs name of sound source)
@@ -164,6 +164,16 @@ classdef SoundSource
             end
             fileName = fullfile(filePath,[obj.name,'.mat']);
             save(fileName, 'obj');
+        end
+        
+        %% rotate method
+        function upend(obj)
+            zOld = obj.sizes(3);
+            xOld = obj.sizes(1);
+            obj.sizes(1) = zOld;
+            obj.sizes(3) = xOld;
+            obj.amplitudeRP = permute(obj.amplitudeRP, [2 1 3]);
+            obj.phaseRP = permute(obj.phaseRP, [2 1 3]);
         end
     end
     

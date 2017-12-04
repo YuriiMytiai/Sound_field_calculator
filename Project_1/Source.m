@@ -40,6 +40,7 @@ classdef Source
            obj.position = position;
            obj.K = K;
         end
+        
     end
     
 end
