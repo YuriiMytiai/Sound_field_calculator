@@ -90,14 +90,14 @@ classdef SoundSource < handle
                     if nargin < 3 || isempty(find(obj.f == freq, 1))
                         error('Enter valid frequency for RP visualization');
                     end
-                    if (sum(size(obj.amplitudeRP) == [360 360 32]) ~= 3) || (~isreal(obj.amplitudeRP))
-                        error('Enter values of amplitude RP for all angles from 1 to 360 in two dimensionals (you must enter tensor with size 360x360x32)');
+                    if (sum(size(obj.amplitudeRP) == [360 181 32]) ~= 3) || (~isreal(obj.amplitudeRP))
+                        error('Enter values of amplitude RP for all angles from 1 to 360 in two dimensionals (you must enter tensor with size 360x181x32)');
                     end
                     
                     figure();
                     visualizeGroup = hggroup;
                     Phi = linspace(0, pi*2, 360);
-                    Theta = linspace(0, pi*2, 360);
+                    Theta = linspace(0, pi, 181);
                     [Phi, Theta] = meshgrid(Phi, Theta);
                     RP = obj.amplitudeRP(:,:,find(obj.f == freq, 1));
                     RP = RP - min(min(RP)); % we can't use negative values for plotting
@@ -133,13 +133,13 @@ classdef SoundSource < handle
                     if nargin < 3 || isempty(find(obj.f == freq, 1))
                         error('Enter valid frequency for RP visualization');
                     end
-                    if (sum(size(obj.phaseRP) == [360 360 32]) ~= 3) || (~isreal(obj.phaseRP))
-                        error('Enter values of phase RP for all angles from 1 to 360 in two dimensionals (you must enter tensor with size 360x360x32)');
+                    if (sum(size(obj.phaseRP) == [360 181 32]) ~= 3) || (~isreal(obj.phaseRP))
+                        error('Enter values of phase RP for all angles from 1 to 360 in two dimensionals (you must enter tensor with size 360x181x32)');
                     end
                     
                     figure();
                     Phi = linspace(0, pi*2, 360);
-                    Theta = linspace(0, pi*2, 360);
+                    Theta = linspace(0, pi, 181);
                     [Phi, Theta] = meshgrid(Phi, Theta);
                     [X, Y, Z] = sph2cart(Theta, Phi, obj.phaseRP(:,:,find(obj.f == freq, 1)));
                     surf(X,Y,Z);
@@ -178,11 +178,11 @@ classdef SoundSource < handle
                 error('Sound source sensitivity is not a valid value');
             end
             
-            if (sum(size(obj.amplitudeRP) == [360 360 32]) ~= 3) || (~isreal(obj.amplitudeRP))
+            if (sum(size(obj.amplitudeRP) == [360 181 32]) ~= 3) || (~isreal(obj.amplitudeRP))
                 error('Sound source amplitude RP is not a valid value (you must enter tensor with size 360x360x32 of real numbers)');
             end
             
-            if (sum(size(obj.phaseRP) == [360 360 32]) ~= 3) || (~isreal(obj.phaseRP))
+            if (sum(size(obj.phaseRP) == [360 181 32]) ~= 3) || (~isreal(obj.phaseRP))
                 error('Sound source phase RP is not a valid value (you must enter tensor with size 360x360x32 of real numbers)');
             end
             

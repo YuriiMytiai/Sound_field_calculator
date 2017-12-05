@@ -15,16 +15,24 @@ xS = source.position(1); % unpack vector with coordinates of source (area coordi
 yS = source.position(2);
 zS = source.position(3);
 
+R = roty(round(source.theta0));
+
+
 xRS = xR - xS; % calculate reciever coordinates in source coordinate system
 yRS = yR - yS;
 zRS = zR - zS;
 
+newC = R*[xRS; yRS; zRS]; % new coordinates accordiong to incline of source
+xRS = newC(1); % unpack vector
+yRS = newC(2);
+zRS = newC(3);
+
 r = sqrt(xRS*xRS + yRS*yRS + zRS*zRS); % distance from source to reciever
-thetaRS = round(acosd(zRS/r)); % nearest integer
+theta = round(acosd(zRS/r)); % nearest integer
 phiRS = round(atan2d(yRS, xRS)); % nearest integer in range [-180 180]
 
-theta = thetaRS + round(source.theta0); % include rotation in two dimensionals
 phi = phiRS + round(source.phi0); 
+
 
 if phi > 359
     phi = phi - 359;
@@ -32,12 +40,7 @@ end
 if phi < 0
     phi = 359 + phi; % change range to [0 360]
 end
-if theta > 359
-    theta = theta - 359;
-end
-if theta < 0
-    theta = 359 + theta; % change range to [0 360]
-end
+
 
 phi = phi + 1; % + 1 cause matlab indexes start from 1;
 theta = theta + 1;
