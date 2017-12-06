@@ -58,6 +58,7 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+
 % UIWAIT makes main wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -150,7 +151,7 @@ for curS = 1:NumSources
     y = y + area.Sources{curS}.position(2) - obj.CP(2);
     z = z + area.Sources{curS}.position(3) - obj.CP(3);
     
-    h1 = surf(x, y, z, ones(size(z)));
+    h1 = surf(x, y, z, ones(size(z)), 'Parent', handles.axes1);
     alpha(h1, 0.2);
 
     Phi = linspace(0, pi*2, 360)';
@@ -172,19 +173,20 @@ for curS = 1:NumSources
 %     Y = newCoordsRP2(2);
 %     Z = newCoordsRP2(3);
     
-    h2 = surf(X, Y, Z);
+    h2 = surf(X, Y, Z, 'Parent', handles.axes1);
     alpha(h2, 1);
     h2.EdgeColor = 'none';
     
-    if area.Sources{curS}.phi0 ~= 0
-        zDir = [0 0 1];
-        rotate(h1, zDir, area.Sources{curS}.phi0, obj.CP);
-        rotate(h2, zDir, area.Sources{curS}.phi0, obj.CP);
-    end
+    
     if area.Sources{curS}.theta0 ~= 0
         yDir = [0 1 0];
-        rotate(h1, yDir, area.Sources{curS}.theta0, obj.CP);
-        rotate(h2, yDir, area.Sources{curS}.theta0, obj.CP);
+        rotate(h1, yDir, area.Sources{curS}.theta0, area.Sources{curS}.position);
+        rotate(h2, yDir, area.Sources{curS}.theta0, area.Sources{curS}.position);
+    end
+    if area.Sources{curS}.phi0 ~= 0
+        zDir = [0 0 1];
+        rotate(h1, zDir, area.Sources{curS}.phi0, area.Sources{curS}.position);
+        rotate(h2, zDir, area.Sources{curS}.phi0, area.Sources{curS}.position);
     end
 
     

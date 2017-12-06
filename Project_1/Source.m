@@ -23,7 +23,7 @@ classdef Source
                error('File with SoundSource object does not exist');
            end
            
-           if (length(position) ~= 3) || (~isempty(find(position <= 0, 1))) || (~isreal(position))
+           if (length(position) ~= 3) || (~isempty(find(position < 0, 1))) || (~isreal(position))
                error('Position are not a valid values');
            end
            

@@ -235,7 +235,10 @@ if isempty(area)
     errordlg('Please, set area parameters before adding sources', 'Create area');
     return
 end
-
+if isempty(filePath)
+    errordlg('Please, select file with SoundSource object', 'Invalid file');
+    return
+end
 SS = load(filePath);
 if ~isa(SS.obj, 'SoundSource')
     errordlg('Please, select file with SoundSource object', 'Invalid file');
