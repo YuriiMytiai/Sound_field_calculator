@@ -103,22 +103,95 @@ global area
 
 waitfor(AddSource(figure(AddSource)));
 
-notEmptyCells = (find(~cellfun('isempty', Ar.Sources)));
+notEmptyCells = (find(~cellfun('isempty', area.Sources)));
 NumSources  = numel(notEmptyCells);
 
 % refresh list of added sources
 listboxItems = cell(NumSources,1);
 for curS = 1:NumSources
-    nameS = [area.Sources{notEmptCells(curS)}.SSobj.name, '_', num2str(notEmptCells(curS))];
+    nameS = [area.Sources{notEmptyCells(curS)}.SSobj.name, '_', num2str(notEmptyCells(curS))];
     listboxItems{curS,1} = nameS;
 end
 set(handles.listbox1, 'String', listboxItems);
 
+%updateAxes1(area);
 axes(handles.axes1);
+cla(handles.axes1);
+Xgrid = area.grid.X;
+Ygrid = area.grid.Y;
+Z = zeros(size(Xgrid));
+C(:,:,1) = zeros(size(Z)) + 1;
+C(:,:,2) = zeros(size(Z)) + 0;
+C(:,:,3) = zeros(size(Z)) + 1;
+surf(Xgrid, Ygrid, Z, C, 'Parent', handles.axes1);
+xlabel('x, m'); ylabel('y, m'); zlabel('z, m');
+axis equal;
+rotate3d on;
+
 hold on;
 for curS = 1:NumSources
+    obj = area.Sources{curS}.SSobj;
+    
+%     Ry = roty(area.Sources{curS}.theta0);
+%     Rz = roty(area.Sources{curS}.phi0);
+    Xx = obj.sizes(1);
+    Yy = obj.sizes(2);
+    Zz = obj.sizes(3);
+%     newCoordsBox1 = Rz * [Xx; Yy; Zz];
+%     newCoordsBox2 = Ry * newCoordsBox1;
+%     Xx = newCoordsBox2(1);
+%     Yy = newCoordsBox2(2);
+%     Zz = newCoordsBox2(3);
+    
+    x = [0 Xx Xx 0 0 Xx Xx 0];
+    y = [0 0 Yy Yy 0 0 Yy Yy] ;
+    z = x'*x*(y')*y/Yy^2/Xx^2*Zz/2;
+    x = x + area.Sources{curS}.position(1) - obj.CP(1);
+    y = y + area.Sources{curS}.position(2) - obj.CP(2);
+    z = z + area.Sources{curS}.position(3) - obj.CP(3);
+    
+    h1 = surf(x, y, z, ones(size(z)));
+    alpha(h1, 0.2);
+
+    Phi = linspace(0, pi*2, 360)';
+    Theta = linspace(0, pi, 181);
+    [Phi, Theta] = meshgrid(Phi, Theta);
+    RP = obj.amplitudeRP(:,:,find(obj.f == 1e3, 1));
+    RP = RP - min(min(RP)); % we can't use negative values for plotting
+    RP = RP ./ max(max(RP)) .* (min(obj.sizes)/2); % normalization to min size of box
+
+    
+    [X, Y, Z] = sph2cartCustom(Phi', Theta', RP);
+    X = X + area.Sources{curS}.position(1);
+    Y = Y + area.Sources{curS}.position(2);
+    Z = Z + area.Sources{curS}.position(3);
+    
+%     newCoordsRP1 = Rz * [X; Y; Z];
+%     newCoordsRP2 = Ry * newCoordsRP1;
+%     X = newCoordsRP2(1);
+%     Y = newCoordsRP2(2);
+%     Z = newCoordsRP2(3);
+    
+    h2 = surf(X, Y, Z);
+    alpha(h2, 1);
+    h2.EdgeColor = 'none';
+    
+    if area.Sources{curS}.phi0 ~= 0
+        zDir = [0 0 1];
+        rotate(h1, zDir, area.Sources{curS}.phi0, obj.CP);
+        rotate(h2, zDir, area.Sources{curS}.phi0, obj.CP);
+    end
+    if area.Sources{curS}.theta0 ~= 0
+        yDir = [0 1 0];
+        rotate(h1, yDir, area.Sources{curS}.theta0, obj.CP);
+        rotate(h2, yDir, area.Sources{curS}.theta0, obj.CP);
+    end
+
     
 end
+hold off
+
+
 
 
 
@@ -178,3 +251,5 @@ function showSumField_Callback(hObject, eventdata, handles)
 % hObject    handle to showSumField (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+function updateAxes1(area)

@@ -31,7 +31,7 @@ classdef SoundSource < handle
         sensitivity;
         amplitudeRP;
         phaseRP;
-        CP = [0.25 0.5 0.25];
+        CP = [0.5 0.25 0.25];
     end
     
     properties (SetObservable)
@@ -210,7 +210,7 @@ classdef SoundSource < handle
         
         %% calculation of Central Point
         function chngCP(obj)
-            obj.CP = obj.sizes .* [0.5 1 0.5];
+            obj.CP = obj.sizes .* [1 0.5 0.5];
         end
         
     end
