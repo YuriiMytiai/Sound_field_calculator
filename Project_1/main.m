@@ -22,7 +22,7 @@ function varargout = main(varargin)
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 07-Dec-2017 09:01:08
+% Last Modified by GUIDE v2.5 07-Dec-2017 11:27:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,6 +58,22 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+ f = [16 20 25 31.5 40 50 63 80 100 125 ...
+            160 200 250 315 400 500 630 800 1e3 1.25e3 ...
+            1.6e3 2e3 2.5e3 3.15e3 4e3 5e3 6.3e3 8e3 1e4 1.25e4 ...
+            1.6e4 2e4]; 
+        
+axes(handles.axes2);        
+semilogx(f, zeros(1,32), 'k', 'LineWidth', 2, 'Parent', handles.axes2);
+axis([16 2e4 -10 3])
+xlabel('f, Hz', 'FontSize', 7); ylabel('SPL, dB', 'FontSize', 7);
+set(gca,'fontsize',7)
+grid on;
+
+axes(handles.axes1);
+pic = imread('audio_pic.png');
+pic(pic == 0) = 256*0.94;
+imshow(pic);
 
 % UIWAIT makes main wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -85,9 +101,9 @@ waitfor(AreaParameters(figure(AreaParameters)));
 Xgrid = area.grid.X;
 Ygrid = area.grid.Y;
 Z = zeros(size(Xgrid));
-C(:,:,1) = zeros(size(Z)) + 1;
-C(:,:,2) = zeros(size(Z)) + 0;
-C(:,:,3) = zeros(size(Z)) + 1;
+C(:,:,1) = zeros(size(Z)) + 44/256;
+C(:,:,2) = zeros(size(Z)) + 230/256;
+C(:,:,3) = zeros(size(Z)) + 106/256;
 
 axes(handles.axes1);
 surf(Xgrid, Ygrid, Z, C, 'Parent', handles.axes1);
@@ -121,9 +137,9 @@ cla(handles.axes1);
 Xgrid = area.grid.X;
 Ygrid = area.grid.Y;
 Z = zeros(size(Xgrid));
-C(:,:,1) = zeros(size(Z)) + 1;
-C(:,:,2) = zeros(size(Z)) + 0;
-C(:,:,3) = zeros(size(Z)) + 1;
+C(:,:,1) = zeros(size(Z)) + 44/256;
+C(:,:,2) = zeros(size(Z)) + 230/256;
+C(:,:,3) = zeros(size(Z)) + 106/256;
 surf(Xgrid, Ygrid, Z, C, 'Parent', handles.axes1);
 xlabel('x, m'); ylabel('y, m'); zlabel('z, m');
 axis equal;
@@ -231,9 +247,9 @@ cla(handles.axes1);
 Xgrid = area.grid.X;
 Ygrid = area.grid.Y;
 Z = zeros(size(Xgrid));
-C(:,:,1) = zeros(size(Z)) + 1;
-C(:,:,2) = zeros(size(Z)) + 0;
-C(:,:,3) = zeros(size(Z)) + 1;
+C(:,:,1) = zeros(size(Z)) + 44/256;
+C(:,:,2) = zeros(size(Z)) + 230/256;
+C(:,:,3) = zeros(size(Z)) + 106/256;
 surf(Xgrid, Ygrid, Z, C, 'Parent', handles.axes1);
 xlabel('x, m'); ylabel('y, m'); zlabel('z, m');
 axis equal;
@@ -339,9 +355,9 @@ cla(handles.axes1);
 Xgrid = area.grid.X;
 Ygrid = area.grid.Y;
 Z = zeros(size(Xgrid));
-C(:,:,1) = zeros(size(Z)) + 1;
-C(:,:,2) = zeros(size(Z)) + 0;
-C(:,:,3) = zeros(size(Z)) + 1;
+C(:,:,1) = zeros(size(Z)) + 44/256;
+C(:,:,2) = zeros(size(Z)) + 230/256;
+C(:,:,3) = zeros(size(Z)) + 106/256;
 surf(Xgrid, Ygrid, Z, C, 'Parent', handles.axes1);
 xlabel('x, m'); ylabel('y, m'); zlabel('z, m');
 axis equal;
@@ -526,8 +542,23 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in showRecFR.
-function showRecFR_Callback(hObject, eventdata, handles)
-% hObject    handle to showRecFR (see GCBO)
+% --- Executes on button press in showRcvFR.
+function showRcvFR_Callback(hObject, eventdata, handles)
+% hObject    handle to showRcvFR (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global area
+
+ f = [16 20 25 31.5 40 50 63 80 100 125 ...
+            160 200 250 315 400 500 630 800 1e3 1.25e3 ...
+            1.6e3 2e3 2.5e3 3.15e3 4e3 5e3 6.3e3 8e3 1e4 1.25e4 ...
+            1.6e4 2e4]; 
+        
+rcvNum = get(handles.listbox2, 'Value');
+
+area.Recievers{rcvNum}.calcFR(area.Sources);
+% show SPL
+axes(handles.axes2);
+semilogx(f, area.Recievers{rcvNum}.MFR, 'k', 'LineWidth', 2, 'Parent', handles.axes2);
+xlabel('f, Hz'); ylabel('SPL, dB');
+grid on;

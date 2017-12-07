@@ -1,4 +1,4 @@
-classdef Reciever
+classdef Reciever < handle
     %Source calss with info about position of SoundSource object in current
     %area
     %   Detailed explanation goes here
