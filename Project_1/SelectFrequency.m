@@ -58,6 +58,11 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+global freq
+if ~isempty(freq)
+    set(handles.freq, 'String', num2str(freq));
+end
+
 % UIWAIT makes SelectFrequency wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -108,11 +113,13 @@ f = [16 20 25 31.5 40 50 63 80 100 125 ...
             1.6e3 2e3 2.5e3 3.15e3 4e3 5e3 6.3e3 8e3 1e4 1.25e4 ...
             1.6e4 2e4];
 
- frequency = str2double(get(handles.freq, 'String'));
+frequency = str2double(get(handles.freq, 'String'));
  
- if isempty(find(frequency == f, 1))
-    errordlg('Please, enter valid frequency value from 1/3 octave range', 'Invalid value');
-    return
- end
+if isempty(find(frequency == f, 1))
+   errordlg('Please, enter valid frequency value from 1/3 octave range', 'Invalid value');
+   return
+end
 
- freq = frequecy;
+freq = frequency;
+ 
+close(SelectFrequency);

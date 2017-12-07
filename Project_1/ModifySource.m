@@ -58,6 +58,19 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+global area sourceNum
+
+set(handles.xPoint, 'String', num2str(area.Sources{sourceNum}.position(1)));
+set(handles.yPoint, 'String', num2str(area.Sources{sourceNum}.position(2)));
+set(handles.zPoint, 'String', num2str(area.Sources{sourceNum}.position(3)));
+set(handles.phi, 'String', num2str(-area.Sources{sourceNum}.phi0));
+set(handles.theta, 'String', num2str(-area.Sources{sourceNum}.theta0));
+set(handles.gain, 'String', num2str(area.Sources{sourceNum}.K));
+set(handles.tau, 'String', num2str(area.Sources{sourceNum}.tau0));
+
+
+
+
 % UIWAIT makes ModifySource wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -73,11 +86,6 @@ function varargout = ModifySource_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes on button press in fileSel.
-function fileSel_Callback(hObject, eventdata, handles)
-% hObject    handle to fileSel (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
 
@@ -224,7 +232,49 @@ function applyBut_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global area sourceNum
 
+if isempty(area)
+    errordlg('Please, set area parameters before adding sources', 'Create area');
+    return
+end
+
+
+xPosition = str2double(get(handles.xPoint, 'String'));
+yPosition = str2double(get(handles.yPoint, 'String'));
+zPosition = str2double(get(handles.zPoint, 'String'));
+
+if isnan(xPosition) || isnan(yPosition) || isnan(zPosition)...
+        || (~isreal(xPosition)) || (~isreal(yPosition)) || (~isreal(zPosition))
+    errordlg('Please, enter a valid position values', 'Invalid values');
+    return
+end
+
+
+phi0 = str2double(get(handles.phi, 'String'));
+theta0 = str2double(get(handles.theta, 'String'));
+K = str2double(get(handles.gain, 'String'));
+
+if isnan(phi0) || isnan(theta0) || isnan(K)...
+        || (~isreal(phi0)) || (~isreal(theta0)) || (~isreal(K))
+    errordlg('Please, enter a valid source parameters', 'Invalid values');
+    return
+end
+
+
+tau0 = str2double(get(handles.tau, 'String'));
+if isnan(tau0) || (~isreal(tau0)) || (tau0 > 0)
+    errordlg('Please, enter a valid delay value', 'Invalid value');
+    return
+end
+
+area.Sources{sourceNum}.phi0 = -phi0;
+area.Sources{sourceNum}.theta0 = -theta0;
+area.Sources{sourceNum}.tau0 = tau0;
+area.Sources{sourceNum}.K = K;
+area.Sources{sourceNum}.position = [xPosition, yPosition, zPosition];
+
+close(ModifySource);
 
 function tau_Callback(hObject, eventdata, handles)
 % hObject    handle to tau (see GCBO)

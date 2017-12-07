@@ -1,4 +1,4 @@
-classdef Source
+classdef Source < handle
     %Source calss with info about position of SoundSource object in current
     %area
     %   Detailed explanation goes here
@@ -9,7 +9,12 @@ classdef Source
         theta0 = 0; % incline in deg
         tau0 = 0; % delay in seconds
         K = 0;% amplyfying coeffitient in dB
-        SSobj % sound source object
+        SSobj; % sound source object
+        preasure;
+    end
+    
+    properties (Constant)
+        p0 = 2e-5;
     end
     
     methods
@@ -41,6 +46,24 @@ classdef Source
            obj.K = K;
         end
         
+        %% preasure calculation    
+        function obj = calcSrcPreasure(obj, grid, freq)
+            if isempty(obj.preasure)
+                obj.preasure.Abs = zeros([size(grid.X), 32]);
+                obj.preasure.Ang = zeros([size(grid.X), 32]);
+            end
+            
+            sizeGrid = size(grid.X);
+            A = zeros(sizeGrid);
+            Phi = A;
+            for xP = 1:size(A,1)
+                for yP = 1:size(A,2)
+                    [A(xP,yP), Phi(xP,yP)] = calcPreasure([grid.X(xP,yP), grid.Y(xP,yP), 0], obj, freq);
+                end
+            end
+            obj.preasure.Abs(:,:,freq) = A;
+            obj.preasure.Ang(:,:,freq) = Phi;
+        end
     end
     
 end

@@ -7,7 +7,7 @@ classdef Reciever
         position % [x y z] position in m, z=0;
         RP; % recieving pattern
         MFR = zeros(1, 32); % magnitude frequency response
-        PFR = zeros(1,32) % phase frequenct response
+        PFR = zeros(1, 32) % phase frequenct response
     end
     
     properties (Constant)
@@ -16,16 +16,16 @@ classdef Reciever
     
     methods
         %% constructor
-        function obj = Source(position)
+        function obj = Reciever(position)
            if nargin < 1
                error('Eneter position of reciever');
            end
            
-           if (length(position) ~= 3) || (~isempty(find(position <= 0, 1))) || (~isreal(position)) || (position(3) ~= 0)
+           if (length(position) ~= 3) || (~isempty(find(position < 0, 1))) || (~isreal(position))
                error('Position are not a valid values');
            end
            
-           obj.position = posiiton;
+           obj.position = position;
  
         end
         

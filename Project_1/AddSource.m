@@ -58,6 +58,10 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+global filePath
+if ~isempty(filePath)
+    set(handles.pathToFileText, 'String', filePath);
+end
 % UIWAIT makes AddSource wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -83,7 +87,7 @@ global filePath
 [FileName, PathName] = uigetfile('*.mat','Select the SoundSource object file');
 filePath = fullfile(PathName, FileName);
 
-set(handles.pathToFileText, 'String', filePath)
+set(handles.pathToFileText, 'String', filePath);
 
 
 
@@ -277,8 +281,8 @@ end
 Src = Source(filePath, [xPosition, yPosition, zPosition], K);
 clear filePath;
 
-Src.phi0 = phi0;
-Src.theta0 = theta0;
+Src.phi0 = -phi0;
+Src.theta0 = -theta0;
 Src.tau0 = tau0;
 area.addSource(Src);
 

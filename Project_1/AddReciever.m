@@ -147,3 +147,27 @@ function applyBut_Callback(hObject, eventdata, handles)
 % hObject    handle to applyBut (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global area
+
+if isempty(area)
+    errordlg('Please, set area parameters before adding sources', 'Create area');
+    return
+end
+
+xPosition = str2double(get(handles.xPoint, 'String'));
+yPosition = str2double(get(handles.yPoint, 'String'));
+zPosition = str2double(get(handles.zPoint, 'String'));
+
+if isnan(xPosition) || isnan(yPosition) || isnan(zPosition)...
+        || (~isreal(xPosition)) || (~isreal(yPosition)) || (~isreal(zPosition))...
+        || (xPosition < 0) || (yPosition < 0) || (zPosition < 0)...
+        || (xPosition > area.xSize) || (yPosition > area.ySize)
+    errordlg('Please, enter a valid position values (inside areaa)', 'Invalid values');
+    return
+end
+
+Rcv = Reciever([xPosition, yPosition, zPosition]);
+
+area.addReciever(Rcv);
+
+close(AddReciever);
