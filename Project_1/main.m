@@ -145,7 +145,7 @@ xlabel('x, m'); ylabel('y, m'); zlabel('z, m');
 axis equal;
 rotate3d on;
 
-hold on;
+hold(handles.axes1, 'on');
 for curS = 1:NumSources
     obj = area.Sources{curS}.SSobj;
     
@@ -192,7 +192,7 @@ for curS = 1:NumSources
 
     
 end
-hold off
+hold(handles.axes1, 'off');
 
 
 
@@ -255,7 +255,8 @@ xlabel('x, m'); ylabel('y, m'); zlabel('z, m');
 axis equal;
 rotate3d on;
 
-hold on;
+
+hold(handles.axes1, 'on');
 for curS = 1:NumSources
     obj = area.Sources{curS}.SSobj;
 
@@ -313,7 +314,7 @@ for curR = 1:NumRecievers
     alpha(h3, 0.4);
 end
 
-hold off;
+hold(handles.axes1, 'off');
 
 
 
@@ -363,7 +364,7 @@ xlabel('x, m'); ylabel('y, m'); zlabel('z, m');
 axis equal;
 rotate3d on;
 
-hold on;
+hold(handles.axes1, 'on');
 for curS = 1:NumSources
     obj = area.Sources{curS}.SSobj;
 
@@ -420,7 +421,7 @@ for curR = 1:NumRecievers
     h3 = surf(X, Y, Z, 'Parent', handles.axes1);
     alpha(h3, 0.4);
 end
-hold off;
+hold(handles.axes1, 'off');
 
 
 % --- Executes on button press in sourceField.
@@ -445,13 +446,13 @@ sourceNum = str2double(Text{end});
 area.Sources{sourceNum}.calcSrcPreasure(area.grid, curFreq);
 % show SPL
 axes(handles.axes1);
-hold on;
+hold(handles.axes1, 'on');
 Xgrid = area.grid.X;
 Ygrid = area.grid.Y;
 Z = zeros(size(Xgrid));
 C = area.Sources{sourceNum}.preasure.Abs(:,:,curFreq);
 surf(Xgrid, Ygrid, Z, C, 'Parent', handles.axes1);
-hold off;
+hold(handles.axes1, 'off');
 
 
 % --- Executes on button press in addReciever.
@@ -469,7 +470,7 @@ NumRecievers  = numel(notEmptyCellsRcv);
 % refresh list of added Recievers
 listboxItems2 = cell(NumRecievers,1);
 for curR = 1:NumRecievers
-    nameR = ['position_', num2str(area.Recievers{notEmptyCellsRcv(curR)}.position)];
+    nameR = ['position [', num2str(area.Recievers{notEmptyCellsRcv(curR)}.position), ']'];
     listboxItems2{curR,1} = nameR;
 end
 set(handles.listbox2, 'String', listboxItems2);
@@ -477,14 +478,14 @@ set(handles.listbox2, 'String', listboxItems2);
 % update figure
 axes(handles.axes1);
 
-hold on;
+hold(handles.axes1, 'on');
 [X,Y,Z] = sphere;
 X = X.*0.3 + area.Recievers{notEmptyCellsRcv(end)}.position(1);
 Y = Y.*0.3 + area.Recievers{notEmptyCellsRcv(end)}.position(2);
 Z = Z.*0.3 + area.Recievers{notEmptyCellsRcv(end)}.position(3);
 h3 = surf(X, Y, Z, 'Parent', handles.axes1);
 alpha(h3, 0.4);
-hold off;
+hold(handles.axes1, 'off');
 
 % --- Executes on button press in showSumField.
 function showSumField_Callback(hObject, eventdata, handles)
@@ -510,13 +511,13 @@ end
 area.calcSumP(curFreq);
 % show SPL
 axes(handles.axes1);
-hold on;
+hold(handles.axes1, 'on');
 Xgrid = area.grid.X;
 Ygrid = area.grid.Y;
 Z = zeros(size(Xgrid));
 C = area.sumField.Abs(:,:,curFreq);
 surf(Xgrid, Ygrid, Z, C, 'Parent', handles.axes1);
-hold off;
+hold(handles.axes1, 'off');
 
 
 % --- Executes on selection change in listbox2.
@@ -560,5 +561,6 @@ area.Recievers{rcvNum}.calcFR(area.Sources);
 % show SPL
 axes(handles.axes2);
 semilogx(f, area.Recievers{rcvNum}.MFR, 'k', 'LineWidth', 2, 'Parent', handles.axes2);
-xlabel('f, Hz'); ylabel('SPL, dB');
+xlabel('f, Hz', 'FontSize', 7); ylabel('SPL, dB', 'FontSize', 7);
+set(gca,'fontsize',7)
 grid on;
