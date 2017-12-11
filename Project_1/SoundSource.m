@@ -83,7 +83,8 @@ classdef SoundSource < handle
                     end
                     
                     figure();
-                    semilogy(obj.f, obj.impedance);
+                    semilogx(obj.f, obj.sensitivity);
+                    axis([obj.f(1) obj.f(end) min(obj.sensitivity) max(obj.sensitivity)]);
                     xlabel('f, Hz'); ylabel('SPL, dB/m/W'); grid on; title('Sensitivity');
                     
                 case 'amplitudeRP'
@@ -96,7 +97,7 @@ classdef SoundSource < handle
                     
                     figure();
                     visualizeGroup = hggroup;
-                    Phi = linspace(0, pi*2, 360);
+                    Phi = linspace(0, pi*2, 360)';
                     Theta = linspace(0, pi, 181);
                     [Phi, Theta] = meshgrid(Phi, Theta);
                     RP = obj.amplitudeRP(:,:,find(obj.f == freq, 1));
@@ -114,7 +115,7 @@ classdef SoundSource < handle
                     hold on;
                     axis equal;
                     
-                    [X, Y, Z] = sph2cart(Theta, Phi, RP);
+                    [X, Y, Z] = sph2cartCustom(Phi', Theta', RP);
                     X = X + obj.CP(1);
                     Y = Y + obj.CP(2);
                     Z = Z + obj.CP(3);
@@ -138,13 +139,40 @@ classdef SoundSource < handle
                     end
                     
                     figure();
-                    Phi = linspace(0, pi*2, 360);
+                    visualizeGroup = hggroup;
+                    Phi = linspace(0, pi*2, 360)';
                     Theta = linspace(0, pi, 181);
                     [Phi, Theta] = meshgrid(Phi, Theta);
-                    [X, Y, Z] = sph2cart(Theta, Phi, obj.phaseRP(:,:,find(obj.f == freq, 1)));
-                    surf(X,Y,Z);
-                    xlabel('x'); ylabel('y'); zlabel('z');
-                    shading interp;
+                    RP = obj.phaseRP(:,:,find(obj.f == freq, 1));
+                    RP = RP - min(min(RP)); % we can't use negative values for plotting
+                    RP = RP ./ max(max(RP)) .* (min(obj.sizes)/2); % normalization to min size of box
+                    
+                    Xx = obj.sizes(1);
+                    Yy = obj.sizes(2);
+                    Zz = obj.sizes(3);
+                    x = [0 Xx Xx 0 0 Xx Xx 0];
+                    y = [0 0 Yy Yy 0 0 Yy Yy] ;
+                    z = x'*x*(y')*y/Yy^2/Xx^2*Zz/2;
+                    h1 = surf(x, y, z, ones(size(z)), 'Parent', visualizeGroup);
+                    alpha(h1, 0.2);
+                    hold on;
+                    axis equal;
+                    
+                    [X, Y, Z] = sph2cartCustom(Phi', Theta', RP);
+                    X = X + obj.CP(1);
+                    Y = Y + obj.CP(2);
+                    Z = Z + obj.CP(3);
+                    h2 = surf(X, Y, Z, 'Parent', visualizeGroup);
+                    alpha(h2, 1);
+                    %shading(h2, 'interp');
+                    h2.EdgeColor = 'none';
+                    
+                    xlabel('x, m'); ylabel('y, m'); zlabel('z, m');
+                    %shading interp;
+                    hold off;
+                    view([120 25]);
+                    
+                    obj.additInfo{1,2} = visualizeGroup;
                     
                 otherwise
                     error('Enter valid property of sound source');          

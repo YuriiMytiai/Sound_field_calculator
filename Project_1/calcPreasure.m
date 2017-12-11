@@ -47,7 +47,7 @@ theta = theta + 1;
 
 alpha = 1.24e-11 * sourceData.f(freq_idx)^2; % air absorbtion coef.
 
-A = sourceData.sensitivity(freq_idx) + source.K - 20*log10(r) + sourceData.amplitudeRP(phi, theta, freq_idx) - 20*alpha*r*log10(exp(1)); % amplitude value of preasure in dB
+A = sourceData.sensitivity(freq_idx) + source.K - 20*log10(r-1) + sourceData.amplitudeRP(phi, theta, freq_idx) - 20*alpha*r*log10(exp(1)); % amplitude value of preasure in dB
 Psi = 2*pi*sourceData.f(freq_idx) * (r/c0 + source.tau0) + sourceData.phaseRP(phi, theta, freq_idx); % phase of preasure in rad
 
 % p = A*exp(-j*Psi)
