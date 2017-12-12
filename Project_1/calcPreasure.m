@@ -15,14 +15,19 @@ xS = source.position(1); % unpack vector with coordinates of source (area coordi
 yS = source.position(2);
 zS = source.position(3);
 
-R = roty(round(source.theta0));
-
+Ry = roty(round(source.theta0));
+Rz = rotz(round(source.phi0));
 
 xRS = xR - xS; % calculate reciever coordinates in source coordinate system
 yRS = yR - yS;
 zRS = zR - zS;
 
-newC = R*[xRS; yRS; zRS]; % new coordinates accordiong to incline of source
+newC = Rz*[xRS; yRS; zRS]; % new coordinates accordiong to incline of source
+xRS = newC(1); % unpack vector
+yRS = newC(2);
+zRS = newC(3);
+
+newC = Ry*[xRS; yRS; zRS]; % new coordinates accordiong to rotation of source
 xRS = newC(1); % unpack vector
 yRS = newC(2);
 zRS = newC(3);
@@ -31,8 +36,7 @@ r = sqrt(xRS*xRS + yRS*yRS + zRS*zRS); % distance from source to reciever
 theta = round(acosd(zRS/r)); % nearest integer
 phiRS = round(atan2d(yRS, xRS)); % nearest integer in range [-180 180]
 
-phi = phiRS + round(source.phi0); 
-
+phi = phiRS;
 
 if phi > 359
     phi = phi - 359;

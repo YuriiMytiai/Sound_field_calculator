@@ -129,6 +129,7 @@ for curS = 1:NumSources
     nameS = [area.Sources{notEmptyCells(curS)}.SSobj.name, '_', num2str(notEmptyCells(curS))];
     listboxItems{curS,1} = nameS;
 end
+set(handles.listbox1,'Value',1);
 set(handles.listbox1, 'String', listboxItems);
 
 %updateAxes1(area);
@@ -146,7 +147,8 @@ axis equal;
 rotate3d on;
 
 hold(handles.axes1, 'on');
-for curS = 1:NumSources
+for curSN = 1:NumSources
+    curS = notEmptyCells(curSN);
     obj = area.Sources{curS}.SSobj;
     
     Xx = obj.sizes(1);
@@ -257,7 +259,8 @@ rotate3d on;
 
 
 hold(handles.axes1, 'on');
-for curS = 1:NumSources
+for curSN = 1:NumSources
+    curS = notEmptyCells(curSN);
     obj = area.Sources{curS}.SSobj;
 
     Xx = obj.sizes(1);
@@ -348,6 +351,7 @@ for curS = 1:NumSources
     nameS = [area.Sources{notEmptyCells(curS)}.SSobj.name, '_', num2str(notEmptyCells(curS))];
     listboxItems{curS,1} = nameS;
 end
+set(handles.listbox1,'Value',1);
 set(handles.listbox1, 'String', listboxItems);
 
 %update figure
@@ -365,7 +369,8 @@ axis equal;
 rotate3d on;
 
 hold(handles.axes1, 'on');
-for curS = 1:NumSources
+for curSN = 1:NumSources
+    curS = notEmptyCells(curSN);
     obj = area.Sources{curS}.SSobj;
 
     Xx = obj.sizes(1);
@@ -477,6 +482,7 @@ for curR = 1:NumRecievers
     nameR = ['position [', num2str(area.Recievers{notEmptyCellsRcv(curR)}.position), ']'];
     listboxItems2{curR,1} = nameR;
 end
+set(handles.listbox2,'Value',1);
 set(handles.listbox2, 'String', listboxItems2);
 
 % update figure
@@ -686,12 +692,14 @@ set(handles.listbox2, 'String', listboxItems2);
 axes(handles.axes1);
 
 hold(handles.axes1, 'on');
-[X,Y,Z] = sphere;
-X = X.*0.3 + area.Recievers{notEmptyCellsRcv(end)}.position(1);
-Y = Y.*0.3 + area.Recievers{notEmptyCellsRcv(end)}.position(2);
-Z = Z.*0.3 + area.Recievers{notEmptyCellsRcv(end)}.position(3);
-h3 = surf(X, Y, Z, 'Parent', handles.axes1);
-alpha(h3, 0.4);
+for curR = 1:NumRecievers
+    [X,Y,Z] = sphere;
+    X = X.*0.3 + area.Recievers{notEmptyCellsRcv(curR)}.position(1);
+    Y = Y.*0.3 + area.Recievers{notEmptyCellsRcv(curR)}.position(2);
+    Z = Z.*0.3 + area.Recievers{notEmptyCellsRcv(curR)}.position(3);
+    h3 = surf(X, Y, Z, 'Parent', handles.axes1);
+    alpha(h3, 0.4);
+end
 hold(handles.axes1, 'off');
 
 
