@@ -59,9 +59,6 @@ for curFile = 1:length(filesList);
         elseif thetaFile == 90;
             theta = 90 - phiFile;
             phi = 0;
-%             if theta == 0
-%                 phi = 90;
-%             end
             if theta < 0
                 theta = abs(theta);
                 phi = 180;
@@ -76,13 +73,8 @@ end
 for curF = 1:length(f)
     clear B;
     B = ARP(:,:,curF);
-
     idxgood = ~(isnan(B)); 
     Bq = griddata(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta, 'v4');
-    %Bq = interp2(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta);
-%     idxgood = ~(isnan(Bq)); 
-%     Bq = griddata(Phi(idxgood), Theta(idxgood), Bq(idxgood)', Phi, Theta, 'v4');
-
     SPL11 = Bq(1,1);
     Bq = Bq - SPL11;
     AbsRP(1:181, 1:91, curF) = Bq;
@@ -91,18 +83,19 @@ for curF = 1:length(f)
     halfRP = AbsRP(1:360, 1:91, curF);
     halfRP = fliplr(halfRP);
     AbsRP(:,91:181, curF) = halfRP;
+
     
+    clear B;
     B = PRP(:,:,curF);
     idxgood = ~(isnan(B)); 
-    Bq = griddata(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta, 'v4');
-    %Bq = interp2(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta, 'nearest');
-    
+    Bq = griddata(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta, 'v4'); 
     PhaseRP(1:181, 1:91, curF) = Bq;
     Bq = flipud(Bq);
     PhaseRP(181:360, 1:91, curF) = Bq(1:(end-1),:);
     halfRP = PhaseRP(1:360, 1:91, curF);
     halfRP = fliplr(halfRP);
     PhaseRP(:,91:181, curF) = halfRP;
+    
 end
 
 end
