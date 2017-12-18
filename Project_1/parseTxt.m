@@ -25,11 +25,11 @@ for curFile = 1:length(filesList);
     thetaFile = str2double(C{2})/100;
     phiFile = str2double(C{3})/100;
     
-    fileID = fopen(fullfile(filesPath,filesList(curFile).name),'r');
-    Intro = textscan(fileID,'%s',1,'Delimiter','\n');
+    fileID = fopen(fullfile(filesPath, filesList(curFile).name), 'r');
+    Intro = textscan(fileID, '%s', 1, 'Delimiter', '\n');
     formatSpec = '%f %f %f';
     sizeA = [3 Inf];
-    A = fscanf(fileID,formatSpec, sizeA);
+    A = fscanf(fileID, formatSpec, sizeA);
     fclose(fileID);
     
     indxs = findClosest(A(1,:),f);
@@ -77,8 +77,11 @@ for curF = 1:length(f)
     clear B;
     B = ARP(:,:,curF);
 
-    idxgood=~(isnan(B)); 
-    Bq = griddata(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta);
+    idxgood = ~(isnan(B)); 
+    Bq = griddata(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta, 'v4');
+    %Bq = interp2(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta);
+%     idxgood = ~(isnan(Bq)); 
+%     Bq = griddata(Phi(idxgood), Theta(idxgood), Bq(idxgood)', Phi, Theta, 'v4');
 
     SPL11 = Bq(1,1);
     Bq = Bq - SPL11;
@@ -90,8 +93,10 @@ for curF = 1:length(f)
     AbsRP(:,91:181, curF) = halfRP;
     
     B = PRP(:,:,curF);
-    idxgood=~(isnan(B)); 
-    Bq = griddata(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta);
+    idxgood = ~(isnan(B)); 
+    Bq = griddata(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta, 'v4');
+    %Bq = interp2(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta, 'nearest');
+    
     PhaseRP(1:181, 1:91, curF) = Bq;
     Bq = flipud(Bq);
     PhaseRP(181:360, 1:91, curF) = Bq(1:(end-1),:);
