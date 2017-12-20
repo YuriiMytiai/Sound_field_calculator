@@ -11,7 +11,7 @@ filesList = dir(fullfile(filesPath, '*.txt'));
 
 AbsRP = zeros(360,181,length(f));
 PhaseRP = zeros(360,181,length(f));
-ARP = zeros(181,91,length(f))+NaN;
+ARP = zeros(181,91,length(f)) + NaN;
 PRP = ARP;
 
 phi = 1:181;
@@ -71,10 +71,11 @@ for curFile = 1:length(filesList);
 end
 
 for curF = 1:length(f)
-    clear B;
+    clear B Bq;
     B = ARP(:,:,curF);
-    idxgood = ~(isnan(B)); 
-    Bq = griddata(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta, 'v4');
+    
+    Bq = interpCustom(B, Phi, Theta);
+   
     SPL11 = Bq(1,1);
     Bq = Bq - SPL11;
     AbsRP(1:181, 1:91, curF) = Bq;
@@ -85,10 +86,11 @@ for curF = 1:length(f)
     AbsRP(:,91:181, curF) = halfRP;
 
     
-    clear B;
+    clear B Bq;
     B = PRP(:,:,curF);
-    idxgood = ~(isnan(B)); 
-    Bq = griddata(Phi(idxgood), Theta(idxgood), B(idxgood)', Phi, Theta, 'v4'); 
+    
+    Bq = interpCustom(B, Phi, Theta); 
+    
     PhaseRP(1:181, 1:91, curF) = Bq;
     Bq = flipud(Bq);
     PhaseRP(181:360, 1:91, curF) = Bq(1:(end-1),:);
@@ -107,3 +109,14 @@ end
             end
     end
     
+%%
+function Bq = interpCustom(B, Phi, Theta)
+    B = B';
+    Br = reshape(B,[1, numel(B)]);
+    BqNp = py.interp.python_interp(Br);
+    Bq = reshape(cell2mat(cell(BqNp.ravel('F').tolist())),size(B)); 
+    Bq = Bq';
+    idxgood = ~(isnan(Bq)); 
+    Bq = griddata(Phi(idxgood), Theta(idxgood), Bq(idxgood), Phi, Theta, 'nearest'); 
+    
+end
