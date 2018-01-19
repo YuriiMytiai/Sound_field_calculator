@@ -54,7 +54,7 @@ public class SoundSource implements Serializable {
     }
 
     public void setSizes(double[] s_sizes) {
-        if ((s_sizes.length == sizes.length) & !(anyNegative1D(s_sizes))) {
+        if ((s_sizes.length == sizes.length) & !(SomeMath.anyNegative1D(s_sizes))) {
         } else {
         sizes = s_sizes;
 	        for(int i = 0; i < sizes.length; i++) {
@@ -95,15 +95,6 @@ public class SoundSource implements Serializable {
     	return centralPoint;
     }
 
-    public static boolean anyNegative1D(double[] arr) {
-        boolean ans = false;
-        for(int i = 0; i < arr.length; i++) {
-            if(arr[i] < 0) {
-                ans = true;
-                break;
-            }
-        }
-        return ans;
-    }
+    
 
 }
