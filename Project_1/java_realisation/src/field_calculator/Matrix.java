@@ -53,6 +53,17 @@ public class Matrix {
         return c;
     }
 
+    // return C = A - b
+    public static double[][] subtract(double[][] a, double b) {
+        int m = a.length;
+        int n = a[0].length;
+        double[][] c = new double[m][n];
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                c[i][j] = a[i][j] - b;
+        return c;
+    }
+
     // return c = a * b
     public static double[][] multiply(double[][] a, double[][] b) {
         int m1 = a.length;
@@ -124,6 +135,28 @@ public class Matrix {
             for (int j = 0; j < m; j++)
                 y[i][j] = Math.log10(a[i][j]) ;
         return y;
+    }
+
+    // return array ans[0] = minValue, ans[1] = index(minValue)i, ans[2] = index(minValue)j
+    public static double[] minValue(double[][] a) {
+        double minV = a[0][0];
+        double idxI = 0;
+        double idxJ = 0;
+        double[] ans = new double[3];
+
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a[0].length; j++) {
+                if (a[i][j] < minV) {
+                    minV = a[i][j];
+                    idxI = i;
+                    idxJ = j;
+                }
+            }
+        }
+        ans[0] = minV;
+        ans[1] = idxI;
+        ans[2] = idxJ;
+        return ans;
     }
 
     

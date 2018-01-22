@@ -8,8 +8,10 @@ import ch.systemsx.cisd.hdf5.*;
 public class CreateSoundSource {
 	
 	public static void main(String[] args) {
-		String name = args[0];
-		String fileName = args[1];
+		//String name = args[0];
+		//String fileName = args[1];
+		String name = "debg";
+		String fileName = "fly6.h5";
 		CreateSoundSource newSrc = new CreateSoundSource();
 		newSrc.newFile(name, fileName);
 	}
@@ -40,6 +42,8 @@ public class CreateSoundSource {
 			newSource.setSensitivity(sensitivity);
 			newSource.setSizes(sizes);
 			newSource.setWeight(weight);
+
+			//newSource.plotAmplitudeRP(5000);
 			
 			FileOutputStream fileStream = new FileOutputStream((name + ".ser"));
 			ObjectOutputStream os = new ObjectOutputStream(fileStream);
