@@ -6,7 +6,6 @@ import org.jzy3d.chart.Chart;
 import org.jzy3d.chart.controllers.mouse.camera.AWTCameraMouseController;
 import org.jzy3d.colors.ColorMapper;
 import org.jzy3d.colors.Color;
-import org.jzy3d.colors.colormaps.ColorMapRBG;
 import org.jzy3d.colors.colormaps.ColorMapRainbow;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.Point;
@@ -125,9 +124,13 @@ public class SoundSource implements Serializable {
     public void plotSensitivity() {
         Plot2DPanel panel = new Plot2DPanel();
         panel.addLinePlot("Sensitivity", FREQS, sensitivity);
+        panel.setAxisScale(0,"LOG");
+        panel.setFixedBounds(0, FREQS[0], FREQS[(FREQS.length-1)]);
+        panel.setAxisLabel(0,"f, Hz");
+        panel.setAxisLabel(1,"SPL1.1, dB");
         JFrame frame= new JFrame("Histogram");
         frame.setContentPane(panel);
-        frame.setSize(500, 600);
+        frame.setSize(600, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
@@ -135,9 +138,13 @@ public class SoundSource implements Serializable {
     public void plotImpedance() {
         Plot2DPanel panel = new Plot2DPanel();
         panel.addLinePlot("Impedance", FREQS, impedance);
+        panel.setAxisScale(0,"LOG");
+        panel.setFixedBounds(0, FREQS[0], FREQS[(FREQS.length-1)]);
+        panel.setAxisLabel(0,"f, Hz");
+        panel.setAxisLabel(1,"|Z|, Ohm");
         JFrame frame= new JFrame("Histogram");
         frame.setContentPane(panel);
-        frame.setSize(500, 600);
+        frame.setSize(300, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }

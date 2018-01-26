@@ -44,6 +44,7 @@ public class CreateSoundSource {
 			newSource.setWeight(weight);
 
 			//newSource.plotAmplitudeRP(5000);
+			newSource.plotSensitivity();
 			
 			FileOutputStream fileStream = new FileOutputStream((name + ".ser"));
 			ObjectOutputStream os = new ObjectOutputStream(fileStream);

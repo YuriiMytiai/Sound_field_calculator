@@ -3,21 +3,23 @@ package field_calculator;
 
 public class Source {
 	
-	int number;
-	double[] position = {0, 0, 0};
-	int phi0 = 0;
-	int theta0 = 0;
-	double tau0 = 0;
-	double kAmp = 0;
-	SoundSource soundSourceObj;
-	double[][][] preasureAbs;
-	double[][][] preasurePhase;
-	int c0 = 340;
+	public int number;
+	public String name;
+	public double[] position = {0, 0, 0};
+	public int phi0 = 0;
+	public int theta0 = 0;
+	public double kAmp = 0;
+	public double tau0 = 0;
+	public SoundSource soundSourceObj;
+	public double[][][] preasureAbs;
+	public double[][][] preasurePhase;
+	public double c0 = 340;
 	
-	public Source(int num, double[] pos, SoundSource ssObj) {
+	public Source(int num, String name_, double[] pos, SoundSource ssObj) {
 		number = num;
 		position = pos;
 		soundSourceObj = ssObj;
+		name = name_;
 	}
 	
 	public void calcSourcePreasure(double[][] gridX, double[][] gridY, int freqIdx) {

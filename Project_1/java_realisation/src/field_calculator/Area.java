@@ -7,17 +7,17 @@ import org.apache.commons.math3.complex.Complex;
 
 public class Area {
 	
-	public final double P0 = 2e-5;
-	private double xSize;
-	private double ySize;
-	private double xStep;
-	private double yStep;
-	double[][] gridX;
-	double[][] gridY;
-	HashMap<Integer, Source> sources = new HashMap<Integer, Source>();
-	double[][][] sumFieldAbs;
-	double[][][] sumFieldPhase;
-	private int sourcesCounter = -1;
+	public static final double P0 = 2e-5;
+	public double xSize;
+	public double ySize;
+	public double xStep;
+	public double yStep;
+	public double[][] gridX;
+	public double[][] gridY;
+	public HashMap<Integer, Source> sources = new HashMap<Integer, Source>();
+	public double[][][] sumFieldAbs;
+	public double[][][] sumFieldPhase;
+	//private int sourcesCounter = 0;
 	
 	public Area(double xSize_, double ySize_, double xStep_, double yStep_) {
 		xSize = xSize_;
@@ -38,17 +38,16 @@ public class Area {
 		}
 		
 		double[] xPoints = SomeMath.linspace(0, xSize, (int) numXPoints);
-		double[] yPoints = SomeMath.linspace(0, xSize, (int) numYPoints);
+		double[] yPoints = SomeMath.linspace(0, ySize, (int) numYPoints);
 		
 		ArrayList<double[][]> grids = SomeMath.meshgrid(xPoints, yPoints);
 		gridX = grids.get(0);
 		gridY = grids.get(1);
 	}
 	
-	public void addSource(Source source) {
-		sourcesCounter++;
-		source.number = sourcesCounter++;
-		sources.put(sourcesCounter, source);
+	public void addSource(Source source, int place) {
+		sources.put(place, source);
+		//sourcesCounter++;
 	}
 	
 	@SuppressWarnings("null")
