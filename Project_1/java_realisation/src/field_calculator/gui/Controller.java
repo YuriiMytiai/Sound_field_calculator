@@ -14,12 +14,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import org.jzy3d.chart.AWTChart;
 import org.jzy3d.colors.Color;
 import org.jzy3d.colors.ColorMapper;
 import org.jzy3d.colors.colormaps.ColorMapGrayscale;
+import org.jzy3d.colors.colormaps.ColorMapRainbow;
 import org.jzy3d.colors.colormaps.ColorMapWhiteGreen;
 import org.jzy3d.maths.BoundingBox3d;
 import org.jzy3d.maths.Coord3d;
@@ -27,15 +27,20 @@ import org.jzy3d.plot3d.primitives.Parallelepiped;
 import org.jzy3d.plot3d.primitives.Point;
 import org.jzy3d.plot3d.primitives.Polygon;
 import org.jzy3d.plot3d.primitives.Shape;
+import org.jzy3d.plot3d.primitives.axes.layout.IAxeLayout;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jzy3d.javafx.JavaFXChartFactory;
+import org.jzy3d.plot3d.rendering.view.View;
+import org.jzy3d.plot3d.rendering.view.ViewportMode;
+import org.jzy3d.plot3d.rendering.view.modes.ViewPositionMode;
 import org.jzy3d.plot3d.transform.Rotate;
 import org.jzy3d.plot3d.transform.Transform;
 import org.jzy3d.plot3d.transform.Translate;
+import org.jzy3d.plot3d.rendering.legends.colorbars.AWTColorbarLegend;
 
 import java.awt.*;
 import java.io.File;
@@ -86,11 +91,13 @@ public class Controller extends Component {
     public Label fileNameText;
     final ObservableList<String> listItems = FXCollections.observableArrayList();
     public Button applyModificationBut;
+    private boolean wasPressed = false;
 
     public Pane chart3;
     public ChoiceBox freqChoise;
     public Button singleSourceCalcBut;
     public Button sumFieldCalcBut;
+    final ObservableList<String> freqList = FXCollections.observableArrayList();
 
 
 
@@ -122,6 +129,12 @@ public class Controller extends Component {
 
         ImageView imageView = factory.bindImageView(chart);
         chart1.getChildren().add(imageView);
+
+        for (double freq:Area.FREQS) {
+            freqList.add(Double.toString(freq));
+        }
+        freqChoise.setValue(Double.toString(Area.FREQS[18]));
+        freqChoise.setItems(freqList);
     }
 
     public void addSourceButCallback(ActionEvent actionEvent) {
@@ -229,9 +242,61 @@ public class Controller extends Component {
     }
 
     public void singleSourceCalcButCallback(ActionEvent actionEvent) {
+        int selectedSource = sourcesList.getSelectionModel().getSelectedIndex();
+        String field = listItems.get(selectedSource);
+        String sourceNum = field.split("\\_")[0];
+        int freqIdx = freqChoise.getSelectionModel().getSelectedIndex();
+
+        area.sources.get(Integer.parseInt(sourceNum)).calcSourcePreasure(area.gridX, area.gridY, freqIdx);
+
+        chart3.getChildren().removeAll();
+
+        Shape surface = buildPreasureFieldShape(area.sources.get(Integer.parseInt(sourceNum)).preasureAbs[freqIdx]);
+        JavaFXChartFactory factory = new JavaFXChartFactory();
+        Quality quality = Quality.Intermediate;
+        AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
+
+        AWTColorbarLegend cbar = new AWTColorbarLegend(surface, chart.getView().getAxe().getLayout());
+        surface.setLegend(cbar);
+        surface.setLegendDisplayed(true); // opens a colorbar on the right part of the display
+
+        chart.getScene().getGraph().add(surface);
+        chart.getView().setSquared(false);
+        //layout2d(chart);
+
+        ImageView imageView = factory.bindImageView(chart);
+        // JavaFX
+        chart3.getChildren().add(imageView);
     }
 
     public void sumFieldCalcButCallback(ActionEvent actionEvent) {
+        int freqIdx = freqChoise.getSelectionModel().getSelectedIndex();
+
+        for (Integer key: area.sources.keySet()) {
+            area.sources.get(key).calcSourcePreasure(area.gridX, area.gridY, freqIdx);
+        }
+
+        area.calcSummPreasure(freqIdx);
+
+        chart3.getChildren().removeAll();
+
+        Shape surface = buildPreasureFieldShape(area.sumFieldAbs[freqIdx]);
+        JavaFXChartFactory factory = new JavaFXChartFactory();
+        Quality quality = Quality.Intermediate;
+        AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
+
+        AWTColorbarLegend cbar = new AWTColorbarLegend(surface, chart.getView().getAxe().getLayout());
+        surface.setLegend(cbar);
+        surface.setLegendDisplayed(true); // opens a colorbar on the right part of the display
+
+        chart.getScene().getGraph().add(surface);
+        chart.getView().setSquared(false);
+        //layout2d(chart);
+
+        ImageView imageView = factory.bindImageView(chart);
+        // JavaFX
+        chart3.getChildren().add(imageView);
+
     }
 
     private void addSourceGroupVisible(boolean setVisibleValue) {
@@ -337,16 +402,45 @@ public class Controller extends Component {
         return surface;
     }
 
-    public void refreshArea(Event event) {
-        Shape surface = buildSurface();
-        JavaFXChartFactory factory = new JavaFXChartFactory();
-        Quality quality = Quality.Intermediate;
-        AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
-        chart.getScene().getGraph().add(surface);
-        chart.getView().setSquared(false);
+    private Shape buildPreasureFieldShape(double[][] pressure) {
+        double[][] x = area.gridX;
+        double[][] y = area.gridY;
 
-        ImageView imageView = factory.bindImageView(chart);
-        chart2.getChildren().add(imageView);
+        // Create the 3d object
+        List<Polygon> polygons = new ArrayList<>();
+        for (int i = 0; i < (x.length - 1); i++) {
+            for (int j = 0; j < (x[0].length - 1); j++) {
+                Polygon polygon = new Polygon();
+                polygon.add(new Point( new Coord3d(x[i][j], y[i][j], pressure[i][j]) ));
+                polygon.add(new Point( new Coord3d(x[i][j+1], y[i][j+1], pressure[i][j+1])));
+                polygon.add(new Point( new Coord3d(x[i+1][j+1], y[i+1][j+1], pressure[i+1][j+1])));
+                polygon.add(new Point( new Coord3d(x[i+1][j], y[i+1][j], pressure[i+1][j])));
+                polygons.add(polygon);
+            }
+        }
+
+        // Jzy3d
+        Shape surface = new Shape(polygons);
+        surface.setColorMapper(new ColorMapper(new ColorMapRainbow(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1,1,1,1f)));
+        surface.setWireframeDisplayed(true);
+        surface.setWireframeColor(Color.GRAY);
+        return surface;
+    }
+
+    public void refreshArea(Event event) {
+
+        if (wasPressed == false) {
+            Shape surface = buildSurface();
+            JavaFXChartFactory factory = new JavaFXChartFactory();
+            Quality quality = Quality.Intermediate;
+            AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
+            chart.getScene().getGraph().add(surface);
+            chart.getView().setSquared(false);
+
+            ImageView imageView = factory.bindImageView(chart);
+            chart2.getChildren().add(imageView);
+            wasPressed = true;
+        }
     }
 
     public void selectSoundSource(MouseEvent mouseEvent) {
@@ -380,5 +474,15 @@ public class Controller extends Component {
         addSourceGroupVisible(false);
 
         plotSources();
+    }
+
+    private static void layout2d(AWTChart chart) {
+        View view = chart.getView();
+        view.setViewPositionMode(ViewPositionMode.TOP);
+        view.getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
+
+        IAxeLayout axe = chart.getAxeLayout();
+        axe.setZAxeLabelDisplayed(false);
+        axe.setTickLineDisplayed(false);
     }
 }

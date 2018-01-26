@@ -109,8 +109,8 @@ public class Matrix {
         int n = a[0].length;
         
         double[][] y = new double[m][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < m; j++)
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
                 y[i][j] = Math.pow(x, a[i][j]) ;
         return y;
     }
@@ -120,8 +120,8 @@ public class Matrix {
         int n = a[0].length;
         
         double[][] y = new double[m][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < m; j++)
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
                 y[i][j] = x * a[i][j] ;
         return y;
     }
@@ -131,8 +131,8 @@ public class Matrix {
         int n = a[0].length;
         
         double[][] y = new double[m][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < m; j++)
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
                 y[i][j] = Math.log10(a[i][j]) ;
         return y;
     }

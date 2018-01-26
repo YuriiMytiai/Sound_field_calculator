@@ -17,6 +17,10 @@ public class Area {
 	public HashMap<Integer, Source> sources = new HashMap<Integer, Source>();
 	public double[][][] sumFieldAbs;
 	public double[][][] sumFieldPhase;
+	public static final double[] FREQS = {16, 20, 25, 31.5, 40, 50, 63, 80, 100, 125,
+			160, 200, 250, 315, 400, 500, 630, 800, 1e3, 1.25e3,
+			1.6e3, 2e3, 2.5e3, 3.15e3, 4e3, 5e3, 6.3e3, 8e3, 1e4, 1.25e4,
+			1.6e4, 2e4};
 	//private int sourcesCounter = 0;
 	
 	public Area(double xSize_, double ySize_, double xStep_, double yStep_) {
@@ -50,7 +54,7 @@ public class Area {
 		//sourcesCounter++;
 	}
 	
-	@SuppressWarnings("null")
+
 	public void calcSummPreasure(int freqIdx) {
 		if (sumFieldAbs == null) {
 			sumFieldAbs = new double[32][gridX.length][gridX[0].length];
@@ -59,40 +63,45 @@ public class Area {
 		
 		
 	    Complex[][] p = new Complex [gridX.length][gridX[0].length];
+		for(int i = 0; i < p.length; i++) {
+			for (int j = 0; j < p[0].length; j++) {
+				p[i][j] = new Complex(0,0);
+			}
+		}
 	    
 		for (Integer key: sources.keySet()) {
 			
 		     Source curSource = sources.get(key);
-		     double[][] ro = null;
-			 double[][] phi = null;
 			 
-		     ro = Matrix.dotMultiply(P0, Matrix.pow(10, Matrix.dotMultiply(1/20, curSource.preasureAbs[freqIdx])));
-		     phi = Matrix.dotMultiply(-1, curSource.preasureAbs[freqIdx]);
-		     Complex pCur;
+		     double[][] ro = Matrix.dotMultiply(P0, Matrix.pow(10, Matrix.dotMultiply(0.05, curSource.preasureAbs[freqIdx])));
+		     double[][] phi = Matrix.dotMultiply(-1, curSource.preasurePhase[freqIdx]);
 		     
 		     for (int i = 0; i < gridX.length; i++) {
-		            for (int j = 0; j < gridX[0].length; j++) {        	
-		                pCur = new Complex(ro[i][j] * Math.cos(phi[i][j]), ro[i][j] * Math.sin(phi[i][j]));
+		            for (int j = 0; j < gridX[0].length; j++) {
+		            	double Re = ro[i][j] * Math.cos(phi[i][j]);
+		            	double Im = ro[i][j] * Math.sin(phi[i][j]);
+		                Complex pCur = new Complex(Re, Im);
 		                p[i][j] = p[i][j].add(pCur);
 		            }
 		     }    
 		}
 		
-		double[][] absP = null;
+		double[][] absP = new double[gridX.length][gridX[0].length];
 		for (int i = 0; i < gridX.length; i++) {
-            for (int j = 0; j < gridX[0].length; j++) {        	
+            for (int j = 0; j < gridX[0].length; j++) {
                 absP[i][j] = p[i][j].abs();
             }
         }
 		
-		double[][] angP = null;
+		double[][] angP = new double[gridX.length][gridX[0].length];
 		for (int i = 0; i < gridX.length; i++) {
             for (int j = 0; j < gridX[0].length; j++) {        	
-                angP[i][j] = Math.atan2(p[i][j].getImaginary(), p[i][j].getReal());
+                angP[i][j] = p[i][j].getArgument();
             }
         }
-		
-		sumFieldAbs[freqIdx] = Matrix.dotMultiply(20, Matrix.dotMultiply(1/P0, Matrix.dotLog10(absP)));
+
+        double oneDivP0 = 1/P0;
+		sumFieldAbs[freqIdx] = Matrix.dotMultiply(20, Matrix.dotLog10(Matrix.dotMultiply(oneDivP0,absP)));
 		sumFieldPhase[freqIdx] = angP;
 	}
 

@@ -42,23 +42,23 @@ public class Source {
 	
 	private double[] calcPreasure(double gridXP, double gridYP, int freqIdx) {
 		double[][] rotY = RotMatrix.getRotY(theta0);
-		double[][] rotZ = RotMatrix.getRotZ(theta0);
+		double[][] rotZ = RotMatrix.getRotZ(phi0);
 		
-		double xRS = gridXP - position[1];
-		double yRS = gridYP - position[2];
-		double zRS = 0 - position[3];
+		double xRS = gridXP - position[0];
+		double yRS = gridYP - position[1];
+		double zRS = 0 - position[2];
 		double[] packedCoords = {xRS, yRS, zRS};
 		
 		double[] rotatedZ = Matrix.multiply(rotZ, packedCoords);
 		double[] rotatedY = Matrix.multiply(rotY, rotatedZ);
 		
-		xRS = rotatedY[1];
-		yRS = rotatedY[2];
-		zRS = rotatedY[3];
+		xRS = rotatedY[0];
+		yRS = rotatedY[1];
+		zRS = rotatedY[2];
 		
 		double r = Math.sqrt((xRS*xRS + yRS*yRS + zRS*zRS));
-		int theta = (int) Math.round(Math.acos(Math.toRadians(zRS/r)));
-		int phi = (int) Math.round(Math.atan2(yRS, xRS));
+		int theta = (int) Math.toDegrees(Math.round(Math.acos((zRS/r))));
+		int phi = (int) Math.toDegrees(Math.round(Math.atan2(yRS, xRS)));
 		
 		if (phi > 359) {
 			phi -= 359;
@@ -72,16 +72,12 @@ public class Source {
 		double rLog;
 		if (r > 2.1) {
 			rLog = r;
-		} else {rLog = 2.1;};
-		
-		double A;
-		double Psi;
-		
-		A = soundSourceObj.getSensitivity()[freqIdx] + kAmp - 20 * Math.log10(rLog-1) + soundSourceObj.getAmplitudeRP(freqIdx)[theta][phi] - 20 * alpha * r * Math.log10(Math.exp(1));
-		Psi = 2 * Math.PI * SoundSource.FREQS[freqIdx] * (r/c0 + tau0) + soundSourceObj.getPhaseRP(freqIdx)[theta][phi];		
-		double[] preasure = {A, Psi};
-		
-		return preasure;
+		} else {rLog = 2.1;}
+
+		double A = soundSourceObj.getSensitivity()[freqIdx] + kAmp - 20 * Math.log10(rLog-1) + soundSourceObj.getAmplitudeRP(freqIdx)[theta][phi] - 20 * alpha * r * Math.log10(Math.exp(1));
+		double Psi = 2 * Math.PI * SoundSource.FREQS[freqIdx] * (r/c0 + tau0) + soundSourceObj.getPhaseRP(freqIdx)[theta][phi];
+
+		return new double[]{A, Psi};
 	}
 	
 
