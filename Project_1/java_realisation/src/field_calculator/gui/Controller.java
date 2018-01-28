@@ -18,21 +18,16 @@ import javafx.scene.layout.Pane;
 import org.jzy3d.chart.AWTChart;
 import org.jzy3d.colors.Color;
 import org.jzy3d.colors.ColorMapper;
-import org.jzy3d.colors.colormaps.ColorMapGrayscale;
-import org.jzy3d.colors.colormaps.ColorMapRainbow;
-import org.jzy3d.colors.colormaps.ColorMapWhiteGreen;
+import org.jzy3d.colors.colormaps.*;
 import org.jzy3d.maths.BoundingBox3d;
 import org.jzy3d.maths.Coord3d;
-import org.jzy3d.plot3d.primitives.Parallelepiped;
+import org.jzy3d.plot3d.primitives.*;
 import org.jzy3d.plot3d.primitives.Point;
 import org.jzy3d.plot3d.primitives.Polygon;
 import org.jzy3d.plot3d.primitives.Shape;
 import org.jzy3d.plot3d.primitives.axes.layout.IAxeLayout;
+import org.jzy3d.plot3d.primitives.axes.layout.renderers.IntegerTickRenderer;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import org.jzy3d.javafx.JavaFXChartFactory;
 import org.jzy3d.plot3d.rendering.view.View;
 import org.jzy3d.plot3d.rendering.view.ViewportMode;
@@ -41,22 +36,25 @@ import org.jzy3d.plot3d.transform.Rotate;
 import org.jzy3d.plot3d.transform.Transform;
 import org.jzy3d.plot3d.transform.Translate;
 import org.jzy3d.plot3d.rendering.legends.colorbars.AWTColorbarLegend;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
 public class Controller extends Component {
 
 
-
     private Area area;
     private File sourceFile;
     int number = 1;
+    private boolean loadedProject = false;
 
     public Pane chart1;
     public TextField xSizeField;
@@ -64,6 +62,13 @@ public class Controller extends Component {
     public TextField ySizeField;
     public TextField yStepField;
     public Button areaApplyBut;
+    public Button loadProjBut;
+    public Button saveProjBut;
+    public Label yStepLabel;
+    public Label ySizeLabel;
+    public Button newProjBut;
+    public Label xStepLabel;
+    public Label xSizeLabel;
 
     public Tab selSourceTab;
     public Pane chart2;
@@ -119,7 +124,19 @@ public class Controller extends Component {
         }
 
         area = new Area(xSize, ySize, xStep, yStep);
+        plotAreaOnChart1();
 
+        for (double freq:Area.FREQS) {
+            freqList.add(Double.toString(freq));
+        }
+        freqChoise.setValue(Double.toString(Area.FREQS[18]));
+        freqChoise.setItems(freqList);
+
+        chart2.getChildren().removeAll();
+        chart3.getChildren().removeAll();
+    }
+
+    private void plotAreaOnChart1() {
         Shape surface = buildSurface();
         JavaFXChartFactory factory = new JavaFXChartFactory();
         Quality quality = Quality.Intermediate;
@@ -127,20 +144,22 @@ public class Controller extends Component {
         chart.getScene().getGraph().add(surface);
         chart.getView().setSquared(false);
 
+        chart.getAxeLayout().setXTickRenderer( new IntegerTickRenderer() );
+        chart.getAxeLayout().setYTickRenderer( new IntegerTickRenderer() );
+        chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
+        chart.getAxeLayout().setXAxeLabel("X");
+        chart.getAxeLayout().setYAxeLabel("Y");
+        chart.getView().getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
+        chart.getView().setMaximized(true);
+        chart.addMouseCameraController();
+
         ImageView imageView = factory.bindImageView(chart);
         chart1.getChildren().add(imageView);
-
-        for (double freq:Area.FREQS) {
-            freqList.add(Double.toString(freq));
-        }
-        freqChoise.setValue(Double.toString(Area.FREQS[18]));
-        freqChoise.setItems(freqList);
     }
 
     public void addSourceButCallback(ActionEvent actionEvent) {
         addSourceGroupVisible(true);
     }
-
 
     public void modSourceButCallback(ActionEvent actionEvent) {
         addSourceGroupVisible(true);
@@ -169,7 +188,7 @@ public class Controller extends Component {
         area.sources.remove(Integer.parseInt(sourceNum));
         listItems.remove(selectedSource);
         sourcesList.setItems(listItems);
-        plotSources();
+        plotSources(-1, false);
     }
 
     public void applySourceButCallback(ActionEvent actionEvent) {
@@ -209,7 +228,7 @@ public class Controller extends Component {
             listItems.add(name);
             sourcesList.setItems(listItems);
 
-            plotSources();
+            plotSources(-1, false);
             resetFields();
 
         } catch (Exception ex) {
@@ -228,12 +247,9 @@ public class Controller extends Component {
         JFileChooser fileChooser = new JFileChooser();
         FileNameExtensionFilter filterExtensions = new FileNameExtensionFilter("Sound Sources", "ser");
         fileChooser.setFileFilter(filterExtensions);
-
-        /*
-        String userDir = System.getProperty("user.home");
-        userDir = userDir + "/Desktop";
+        String userDir = System.getProperty("user.dir");
         fileChooser.setCurrentDirectory(new File(userDir));
-        */
+
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             sourceFile = fileChooser.getSelectedFile();
@@ -243,30 +259,52 @@ public class Controller extends Component {
 
     public void singleSourceCalcButCallback(ActionEvent actionEvent) {
         int selectedSource = sourcesList.getSelectionModel().getSelectedIndex();
-        String field = listItems.get(selectedSource);
-        String sourceNum = field.split("\\_")[0];
-        int freqIdx = freqChoise.getSelectionModel().getSelectedIndex();
+        try {
+            String field = listItems.get(selectedSource);
 
-        area.sources.get(Integer.parseInt(sourceNum)).calcSourcePreasure(area.gridX, area.gridY, freqIdx);
+            String sourceNum = field.split("\\_")[0];
+            int freqIdx = freqChoise.getSelectionModel().getSelectedIndex();
 
-        chart3.getChildren().removeAll();
+            area.sources.get(Integer.parseInt(sourceNum)).calcSourcePreasure(area.gridX, area.gridY, freqIdx);
 
-        Shape surface = buildPreasureFieldShape(area.sources.get(Integer.parseInt(sourceNum)).preasureAbs[freqIdx]);
-        JavaFXChartFactory factory = new JavaFXChartFactory();
-        Quality quality = Quality.Intermediate;
-        AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
+            chart3.getChildren().removeAll();
 
-        AWTColorbarLegend cbar = new AWTColorbarLegend(surface, chart.getView().getAxe().getLayout());
-        surface.setLegend(cbar);
-        surface.setLegendDisplayed(true); // opens a colorbar on the right part of the display
+            Shape surface = buildPreasureFieldShape(area.sources.get(Integer.parseInt(sourceNum)).preasureAbs[freqIdx]);
+            JavaFXChartFactory factory = new JavaFXChartFactory();
+            Quality quality = Quality.Advanced;
+            AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
 
-        chart.getScene().getGraph().add(surface);
-        chart.getView().setSquared(false);
-        //layout2d(chart);
+            AWTColorbarLegend cbar = new AWTColorbarLegend(surface, chart.getView().getAxe().getLayout());
+            surface.setLegend(cbar);
+            surface.setLegendDisplayed(true); // opens a colorbar on the right part of the display
 
-        ImageView imageView = factory.bindImageView(chart);
-        // JavaFX
-        chart3.getChildren().add(imageView);
+            chart.getScene().getGraph().add(surface);
+            chart.getView().setSquared(false);
+            chart.getView().getCamera().setScreenGridDisplayed(false);
+            chart.getAxeLayout().setXTickRenderer( new IntegerTickRenderer() );
+            chart.getAxeLayout().setYTickRenderer( new IntegerTickRenderer() );
+            chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
+            chart.getAxeLayout().setXAxeLabel("X");
+            chart.getAxeLayout().setYAxeLabel("Y");
+            org.jzy3d.maths.Scale zScale = new org.jzy3d.maths.Scale(surface.getBounds().getZmin(), surface.getBounds().getZmax());
+            chart.getView().setScaleZ(zScale);
+            chart.getView().getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
+            chart.addMouseCameraController();
+            chart.getView().setMaximized(true);
+
+            //layout2d(chart);
+
+            ImageView imageView = factory.bindImageView(chart);
+            // JavaFX
+            chart3.getChildren().add(imageView);
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "Please, select sound source in Sources tab!",
+                    "Source selection error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
     }
 
     public void sumFieldCalcButCallback(ActionEvent actionEvent) {
@@ -291,12 +329,22 @@ public class Controller extends Component {
 
         chart.getScene().getGraph().add(surface);
         chart.getView().setSquared(false);
+        chart.getView().getCamera().setScreenGridDisplayed(false);
+        chart.getAxeLayout().setXTickRenderer( new IntegerTickRenderer() );
+        chart.getAxeLayout().setYTickRenderer( new IntegerTickRenderer() );
+        chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
+        chart.getAxeLayout().setXAxeLabel("X");
+        chart.getAxeLayout().setYAxeLabel("Y");
+        org.jzy3d.maths.Scale zScale = new org.jzy3d.maths.Scale(surface.getBounds().getZmin(), surface.getBounds().getZmax());
+        chart.getView().setScaleZ(zScale);
+        chart.getView().getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
+        chart.addMouseCameraController();
+        chart.getView().setMaximized(true);
         //layout2d(chart);
 
         ImageView imageView = factory.bindImageView(chart);
         // JavaFX
         chart3.getChildren().add(imageView);
-
     }
 
     private void addSourceGroupVisible(boolean setVisibleValue) {
@@ -330,7 +378,7 @@ public class Controller extends Component {
 
     }
 
-    private void plotSources() {
+    private void plotSources(int selectedNum, boolean turnLightOn) {
         chart2.getChildren().removeAll();
 
         Shape surface = buildSurface();
@@ -339,8 +387,13 @@ public class Controller extends Component {
         AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
         chart.getScene().getGraph().add(surface);
 
+        double soundAxisLength = Math.max(area.xSize, area.ySize)*0.3;
+        double maxZPosition = 0;
         for (Integer key:area.sources.keySet()) {
-            Source curSource =area.sources.get(key);
+            Source curSource = area.sources.get(key);
+
+            if (curSource.position[2] > maxZPosition) {maxZPosition = curSource.position[2];}
+
             double xMin = - curSource.soundSourceObj.getCentralPoint()[0];
             double yMin = - curSource.soundSourceObj.getCentralPoint()[1];
             double zMin = - curSource.soundSourceObj.getCentralPoint()[2];
@@ -350,26 +403,56 @@ public class Controller extends Component {
 
             BoundingBox3d bounds = new BoundingBox3d((float) xMin, (float) xMax, (float) yMin, (float) yMax, (float) zMin, (float) zMax);
             Parallelepiped box = new Parallelepiped(bounds);
-            box.setColorMapper(new ColorMapper(new ColorMapGrayscale(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(0.15f,0.15f,015f,0.35f)));
+
+            Color c1 = new Color(255, 0, 0);
+            Point p1 = new Point(new Coord3d(0,0,0), c1);
+            Color c2 = new Color(178, 255, 102);
+            Point p2 = new Point(new Coord3d(soundAxisLength,0,0), c2);
+            LineStrip sourceAxis = new LineStrip(p1, p2);
+
+            if(key == selectedNum && turnLightOn) {
+                box.setColorMapper(new ColorMapper(new ColorMapGrayscale(), 0, 0, new Color(0, 0, 0, 0f)));
+            } else {
+                box.setColorMapper(new ColorMapper(new ColorMapRedAndGreen(), -5, 30, new Color(1f, 1, 1f, 0.35f)));
+            }
             Transform transform = new Transform();
             Rotate rotatePhi = new Rotate(-curSource.phi0, new Coord3d(0, 0, curSource.position[2] + curSource.soundSourceObj.getCentralPoint()[2]));
             Rotate rotateTheta = new Rotate(-curSource.theta0, new Coord3d(0, curSource.position[1] + curSource.soundSourceObj.getCentralPoint()[1], 0));
             transform.add(rotatePhi);
             transform.add(rotateTheta);
             box.applyGeometryTransform(transform);
+            sourceAxis.applyGeometryTransform(transform);
 
             Transform transformShift = new Transform();
             Translate shift = new Translate(new Coord3d(curSource.position[0], curSource.position[1], curSource.position[2]));
             transformShift.add(shift);
             box.applyGeometryTransform(transformShift);
+            sourceAxis.applyGeometryTransform(transformShift);
             chart.getScene().getGraph().add(box);
+            chart.getScene().getGraph().add(sourceAxis);
 
             rotateTheta = null;
             rotatePhi = null;
             transform = null;
         }
+        BoundingBox3d bbox = new BoundingBox3d();
+        bbox.setXmax((float) area.xSize);
+        bbox.setXmin((float) (0));
+        bbox.setYmax((float) area.ySize);
+        bbox.setYmin((float) (0));
+        bbox.setZmax((float) (maxZPosition + 1));
+        bbox.setZmin((float) (0));
+        chart.getView().setBoundManual(bbox);
+        chart.getAxeLayout().setXAxeLabel("X");
+        chart.getAxeLayout().setYAxeLabel("Y");
+        chart.getAxeLayout().setZAxeLabel("Z");
+        chart.getView().getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
+        chart.addMouseCameraController();
 
         chart.getView().setSquared(false);
+        chart.getAxeLayout().setXTickRenderer( new IntegerTickRenderer() );
+        chart.getAxeLayout().setYTickRenderer( new IntegerTickRenderer() );
+        chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
 
         ImageView imageView = factory.bindImageView(chart);
         // JavaFX
@@ -396,7 +479,7 @@ public class Controller extends Component {
 
         // Jzy3d
         Shape surface = new Shape(polygons);
-        surface.setColorMapper(new ColorMapper(new ColorMapWhiteGreen(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1,1,1,1f)));
+        surface.setColorMapper(new ColorMapper(new ColorMapGrayscale(), -5, 1, new Color(1,1,1,1f)));
         surface.setWireframeDisplayed(true);
         surface.setWireframeColor(Color.GRAY);
         return surface;
@@ -421,21 +504,30 @@ public class Controller extends Component {
 
         // Jzy3d
         Shape surface = new Shape(polygons);
-        surface.setColorMapper(new ColorMapper(new ColorMapRainbow(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1,1,1,1f)));
-        surface.setWireframeDisplayed(true);
+        surface.setColorMapper(new ColorMapper(new ColorMapRainbowNoBorder(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1,1,1,1f)));
+        surface.setWireframeDisplayed(false);
         surface.setWireframeColor(Color.GRAY);
+
         return surface;
     }
 
     public void refreshArea(Event event) {
 
-        if (wasPressed == false) {
+        if (!wasPressed && !loadedProject) {
             Shape surface = buildSurface();
             JavaFXChartFactory factory = new JavaFXChartFactory();
             Quality quality = Quality.Intermediate;
             AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
             chart.getScene().getGraph().add(surface);
             chart.getView().setSquared(false);
+
+            chart.getAxeLayout().setXTickRenderer( new IntegerTickRenderer() );
+            chart.getAxeLayout().setYTickRenderer( new IntegerTickRenderer() );
+            chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
+            chart.getAxeLayout().setXAxeLabel("X");
+            chart.getAxeLayout().setYAxeLabel("Y");
+            chart.getView().getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
+            chart.addMouseCameraController();
 
             ImageView imageView = factory.bindImageView(chart);
             chart2.getChildren().add(imageView);
@@ -444,6 +536,10 @@ public class Controller extends Component {
     }
 
     public void selectSoundSource(MouseEvent mouseEvent) {
+        int selectedString = sourcesList.getSelectionModel().getSelectedIndex();
+        String field = listItems.get(selectedString);
+        String sourceNum = field.split("\\_")[0];
+        plotSources(Integer.parseInt(sourceNum), true);
     }
 
     public void applyModificationButCallback(ActionEvent actionEvent) {
@@ -473,7 +569,7 @@ public class Controller extends Component {
         applyModificationBut.setVisible(false);
         addSourceGroupVisible(false);
 
-        plotSources();
+        plotSources(-1, false);
     }
 
     private static void layout2d(AWTChart chart) {
@@ -484,5 +580,112 @@ public class Controller extends Component {
         IAxeLayout axe = chart.getAxeLayout();
         axe.setZAxeLabelDisplayed(false);
         axe.setTickLineDisplayed(false);
+    }
+
+    public void loadProjButtCallback(ActionEvent actionEvent) {
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filterExtensions = new FileNameExtensionFilter("Area object", "ser");
+        fileChooser.setFileFilter(filterExtensions);
+        String userDir = System.getProperty("user.dir");
+        fileChooser.setCurrentDirectory(new File(userDir));
+
+        File areaFile = null;
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            areaFile = fileChooser.getSelectedFile();
+        } else {return;}
+
+        tryOpenAreaFile(areaFile);
+        xSizeField.setText(Double.toString(area.xSize));
+        ySizeField.setText(Double.toString(area.ySize));
+        xStepField.setText(Double.toString(area.xStep));
+        yStepField.setText(Double.toString(area.xStep));
+        newAreaGroupVisible(true);
+        areaApplyBut.setVisible(false);
+
+        plotAreaOnChart1();
+
+        for (double freq:Area.FREQS) {
+            freqList.add(Double.toString(freq));
+        }
+        freqChoise.setValue(Double.toString(Area.FREQS[18]));
+        freqChoise.setItems(freqList);
+
+        for (Integer key: area.sources.keySet()) {
+            Source curSource = area.sources.get(key);
+            String name = curSource.name;
+            listItems.add(name);
+            sourcesList.setItems(listItems);
+        }
+
+        plotSources(-1, false);
+        loadProjBut.setVisible(false);
+        saveProjBut.setVisible(true);
+
+        loadedProject = true;
+    }
+
+    public void saveProjButtCallback(ActionEvent actionEvent) {
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filterExtensions = new FileNameExtensionFilter("Serialized objects", "ser");
+        fileChooser.setFileFilter(filterExtensions);
+        String userDir = System.getProperty("user.dir");
+        fileChooser.setCurrentDirectory(new File(userDir));
+
+        String filename = null;
+        String dir = null;
+        // Demonstrate "Save" dialog:
+        int result = fileChooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            filename = fileChooser.getSelectedFile().getName();
+            if (filename == null) {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                Date date = new Date();
+                filename = "Project " + dateFormat.format(date);
+            }
+            dir = fileChooser.getCurrentDirectory().toString();
+        }
+        if (result == JFileChooser.CANCEL_OPTION) {
+            return;
+        }
+
+        String fullFile = dir + '\\' + filename;
+        try {
+            FileOutputStream fileStream = new FileOutputStream((fullFile + ".ser"));
+            ObjectOutputStream os = new ObjectOutputStream(fileStream);
+            os.writeObject(area);
+            os.close();
+        } catch (Exception ex) {ex.printStackTrace();}
+    }
+
+    public void newProjButtCallback(ActionEvent actionEvent) {
+        loadProjBut.setVisible(false);
+        newAreaGroupVisible(true);
+        saveProjBut.setVisible(true);
+        newProjBut.setVisible(false);
+    }
+
+    private void newAreaGroupVisible(boolean visible) {
+        xSizeLabel.setVisible(visible);
+        xSizeField.setVisible(visible);
+        xStepLabel.setVisible(visible);
+        xStepField.setVisible(visible);
+        ySizeLabel.setVisible(visible);
+        ySizeField.setVisible(visible);
+        yStepLabel.setVisible(visible);
+        yStepField.setVisible(visible);
+        areaApplyBut.setVisible(visible);
+    }
+
+    private void tryOpenAreaFile (File areaFile) {
+        try {
+            FileInputStream fileStream = new FileInputStream(areaFile);
+            ObjectInputStream os = new ObjectInputStream(fileStream);
+            Object firstObject = os.readObject();
+            area = (Area) firstObject;
+            os.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

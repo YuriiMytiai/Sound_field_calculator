@@ -1,11 +1,12 @@
 package field_calculator;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.math3.complex.Complex;
 
-public class Area {
+public class Area implements Serializable {
 	
 	public static final double P0 = 2e-5;
 	public double xSize;

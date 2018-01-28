@@ -10,7 +10,7 @@ public class CreateSoundSource {
 	public static void main(String[] args) {
 		//String name = args[0];
 		//String fileName = args[1];
-		String name = "debg";
+		String name = "MAG_Fly6_v2";
 		String fileName = "fly6.h5";
 		CreateSoundSource newSrc = new CreateSoundSource();
 		newSrc.newFile(name, fileName);

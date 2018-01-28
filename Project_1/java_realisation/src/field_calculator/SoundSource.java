@@ -81,7 +81,6 @@ public class SoundSource implements Serializable {
 
     public void setSizes(double[] s_sizes) {
         if ((s_sizes.length == sizes.length) & !(SomeMath.anyNegative1D(s_sizes))) {
-        } else {
             sizes = s_sizes;
             for (int i = 0; i < sizes.length; i++) {
                 centralPoint[i] = sizes[i] * CP_CONST[i];

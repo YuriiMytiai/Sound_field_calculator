@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
@@ -23,16 +26,19 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Pane fx:id="chart1" layoutX="317.0" layoutY="54.0" prefHeight="402.0" prefWidth="484.0" />
-                        <Label layoutX="28.0" layoutY="58.0" text="X Size" />
-                        <Label layoutX="148.0" layoutY="58.0" text="X Step" />
-                        <Label layoutX="28.0" layoutY="112.0" text="Y Size" />
-                        <Label layoutX="148.0" layoutY="112.0" text="Y Step" />
-                        <TextField layoutX="66.0" layoutY="54.0" prefHeight="25.0" prefWidth="40.0" fx:id="xSizeField" />
-                        <TextField layoutX="190.0" layoutY="54.0" prefHeight="25.0" prefWidth="40.0" fx:id="xStepField" />
-                        <TextField fx:id="ySizeField" layoutX="66.0" layoutY="108.0" prefHeight="25.0" prefWidth="40.0" />
-                        <TextField fx:id="yStepField" layoutX="190.0" layoutY="108.0" prefHeight="25.0" prefWidth="40.0" />
-                        <Button fx:id="areaApplyBut" layoutX="106.0" layoutY="192.0" mnemonicParsing="false" onAction="#areaApplyButCallback" text="Apply" />
+                        <Pane fx:id="chart1" layoutX="317.0" layoutY="54.0" prefHeight="402.0" prefWidth="484.0" AnchorPane.leftAnchor="317.0" AnchorPane.topAnchor="54.0" />
+                        <Button fx:id="loadProjBut" layoutX="115.0" layoutY="54.0" mnemonicParsing="false" onAction="#loadProjButtCallback" text="Load Project" />
+                        <Button fx:id="saveProjBut" layoutX="117.0" layoutY="370.0" mnemonicParsing="false" onAction="#saveProjButtCallback" prefHeight="25.0" prefWidth="82.0" text="Save Project" visible="false" />
+                        <Button fx:id="areaApplyBut" layoutX="124.0" layoutY="266.0" mnemonicParsing="false" onAction="#areaApplyButCallback" text="New Area" visible="false" />
+                        <TextField fx:id="yStepField" layoutX="217.0" layoutY="219.0" prefHeight="25.0" prefWidth="40.0" visible="false" />
+                        <TextField fx:id="ySizeField" layoutX="93.0" layoutY="219.0" prefHeight="25.0" prefWidth="40.0" visible="false" />
+                        <TextField layoutX="217.0" layoutY="165.0" prefHeight="25.0" prefWidth="40.0" visible="false" fx:id="xStepField" />
+                        <TextField layoutX="93.0" layoutY="165.0" prefHeight="25.0" prefWidth="40.0" visible="false" fx:id="xSizeField" />
+                        <Label fx:id="yStepLabel" layoutX="175.0" layoutY="223.0" text="Y Step" visible="false" />
+                        <Label fx:id="ySizeLabel" layoutX="55.0" layoutY="223.0" text="Y Size" visible="false" />
+                        <Label layoutX="175.0" layoutY="169.0" text="X Step" visible="false" fx:id="xStepLabel" />
+                        <Label layoutX="55.0" layoutY="169.0" text="X Size" visible="false" fx:id="xSizeLabel" />
+                        <Button fx:id="newProjBut" layoutX="116.0" layoutY="114.0" mnemonicParsing="false" onAction="#newProjButtCallback" text="New Project" />
                      </children>
                   </AnchorPane>
             </content>
@@ -41,7 +47,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="508.0" prefWidth="843.0">
                      <children>
-                        <Pane fx:id="chart2" layoutX="317.0" layoutY="54.0" prefHeight="402.0" prefWidth="484.0" />
+                        <Pane fx:id="chart2" layoutX="317.0" layoutY="54.0" prefHeight="402.0" prefWidth="484.0" AnchorPane.leftAnchor="317.0" AnchorPane.topAnchor="54.0" />
                         <Button fx:id="addSourceBut" layoutX="24.0" layoutY="54.0" mnemonicParsing="false" onAction="#addSourceButCallback" prefHeight="25.0" prefWidth="51.0" text="Add" />
                         <Button fx:id="modSourceBut" layoutX="24.0" layoutY="142.0" mnemonicParsing="false" onAction="#modSourceButCallback" text="Modify" />
                         <Button fx:id="delSourceBut" layoutX="24.0" layoutY="229.0" mnemonicParsing="false" onAction="#delSourceButCallback" text="Delete" />
@@ -77,7 +83,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Pane fx:id="chart3" layoutX="156.0" layoutY="11.0" prefHeight="460.0" prefWidth="653.0" />
+                        <Pane fx:id="chart3" layoutX="156.0" layoutY="11.0" prefHeight="460.0" prefWidth="653.0" AnchorPane.leftAnchor="156.0" AnchorPane.topAnchor="11.0" />
                         <ChoiceBox fx:id="freqChoise" layoutX="29.0" layoutY="103.0" maxWidth="300.0" prefHeight="25.0" prefWidth="97.0" />
                         <Label layoutX="50.0" layoutY="76.0" text="Frequency" />
                         <Button fx:id="singleSourceCalcBut" layoutX="34.0" layoutY="173.0" mnemonicParsing="false" onAction="#singleSourceCalcButCallback" text="Single Source" />

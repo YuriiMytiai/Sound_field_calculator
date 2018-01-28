@@ -1,7 +1,9 @@
 package field_calculator;
 
 
-public class Source {
+import java.io.Serializable;
+
+public class Source implements Serializable {
 	
 	public int number;
 	public String name;
