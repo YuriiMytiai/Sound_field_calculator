@@ -286,6 +286,7 @@ public class Controller extends Component {
             chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
             chart.getAxeLayout().setXAxeLabel("X");
             chart.getAxeLayout().setYAxeLabel("Y");
+            chart.getAxeLayout().setYAxeLabel("dB SPL");
             org.jzy3d.maths.Scale zScale = new org.jzy3d.maths.Scale(surface.getBounds().getZmin(), surface.getBounds().getZmax());
             chart.getView().setScaleZ(zScale);
             chart.getView().getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
@@ -335,6 +336,7 @@ public class Controller extends Component {
         chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
         chart.getAxeLayout().setXAxeLabel("X");
         chart.getAxeLayout().setYAxeLabel("Y");
+        chart.getAxeLayout().setYAxeLabel("dB SPL");
         org.jzy3d.maths.Scale zScale = new org.jzy3d.maths.Scale(surface.getBounds().getZmin(), surface.getBounds().getZmax());
         chart.getView().setScaleZ(zScale);
         chart.getView().getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
