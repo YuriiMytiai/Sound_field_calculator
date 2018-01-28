@@ -415,11 +415,17 @@ public class Controller extends Component {
             } else {
                 box.setColorMapper(new ColorMapper(new ColorMapRedAndGreen(), -5, 30, new Color(1f, 1, 1f, 0.35f)));
             }
+
             Transform transform = new Transform();
-            Rotate rotatePhi = new Rotate(-curSource.phi0, new Coord3d(0, 0, curSource.position[2] + curSource.soundSourceObj.getCentralPoint()[2]));
             Rotate rotateTheta = new Rotate(-curSource.theta0, new Coord3d(0, curSource.position[1] + curSource.soundSourceObj.getCentralPoint()[1], 0));
-            transform.add(rotatePhi);
             transform.add(rotateTheta);
+            box.applyGeometryTransform(transform);
+            sourceAxis.applyGeometryTransform(transform);
+            transform = null;
+
+            transform = new Transform();
+            Rotate rotatePhi = new Rotate(-curSource.phi0, new Coord3d(0, 0, curSource.position[2] + curSource.soundSourceObj.getCentralPoint()[2]));
+            transform.add(rotatePhi);
             box.applyGeometryTransform(transform);
             sourceAxis.applyGeometryTransform(transform);
 
