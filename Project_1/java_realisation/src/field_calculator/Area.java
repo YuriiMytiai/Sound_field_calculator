@@ -3,8 +3,17 @@ package field_calculator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import javafx.scene.image.ImageView;
 import org.apache.commons.math3.complex.Complex;
+import org.jzy3d.colors.Color;
+import org.jzy3d.colors.ColorMapper;
+import org.jzy3d.colors.colormaps.ColorMapRainbowNoBorder;
+import org.jzy3d.maths.Coord3d;
+import org.jzy3d.plot3d.primitives.Point;
+import org.jzy3d.plot3d.primitives.Polygon;
+import org.jzy3d.plot3d.primitives.Shape;
 
 public class Area implements Serializable {
 	
@@ -104,6 +113,71 @@ public class Area implements Serializable {
         double oneDivP0 = 1/P0;
 		sumFieldAbs[freqIdx] = Matrix.dotMultiply(20, Matrix.dotLog10(Matrix.dotMultiply(oneDivP0,absP)));
 		sumFieldPhase[freqIdx] = angP;
+	}
+
+	public ImageView plotSurface() {
+		Shape surface = buildSurface();
+		return Plotter.plotRectangularSurface(surface);
+	}
+
+	public ImageView plotSources() {
+		Shape surface = buildSurface();
+		ImageView imageView = Plotter.plotAllSources(this, surface);
+		return imageView;
+	}
+
+	public ImageView plotLightedSource(int sourceNum) {
+		Shape surface = buildSurface();
+		ImageView imageView = Plotter.plotLightedSource(this, surface, sourceNum);
+		return imageView;
+	}
+
+	private Shape buildSurface() {
+		return Plotter.buildRectSurface(gridX, gridY);
+	}
+
+	public ImageView plotSingleSourceField(int freqIdx, int sourceNum) {
+		Shape surface = buildPreasureFieldShape(freqIdx, true, sourceNum);
+		ImageView imageView = Plotter.plotField(surface);
+		return imageView;
+	}
+
+	public ImageView plotSummaryField(int freqIdx) {
+		Shape surface = buildPreasureFieldShape(freqIdx, false, -1);
+		ImageView imageView = Plotter.plotField(surface);
+		return imageView;
+	}
+
+	private Shape buildPreasureFieldShape(int freqIdx, boolean isSingle, int sourceNum) {
+		double[][] x = gridX;
+		double[][] y = gridY;
+		double[][] pressure;
+		if(isSingle) {
+			pressure = sources.get(sourceNum).preasureAbs[freqIdx];
+		} else {
+			pressure = sumFieldAbs[freqIdx];
+		}
+
+		// Create the 3d object
+		List<Polygon> polygons = new ArrayList<>();
+		for (int i = 0; i < (x.length - 1); i++) {
+			for (int j = 0; j < (x[0].length - 1); j++) {
+				Polygon polygon = new Polygon();
+				polygon.add(new Point( new Coord3d(x[i][j], y[i][j], pressure[i][j]) ));
+				polygon.add(new Point( new Coord3d(x[i][j+1], y[i][j+1], pressure[i][j+1])));
+				polygon.add(new Point( new Coord3d(x[i+1][j+1], y[i+1][j+1], pressure[i+1][j+1])));
+				polygon.add(new Point( new Coord3d(x[i+1][j], y[i+1][j], pressure[i+1][j])));
+				polygons.add(polygon);
+			}
+		}
+
+		// Jzy3d
+		Shape surface = new Shape(polygons);
+		surface.setColorMapper(new ColorMapper(new ColorMapRainbowNoBorder(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1,1,1,1f)));
+		surface.setWireframeDisplayed(false);
+		surface.setWireframeColor(Color.GRAY);
+
+		return surface;
 	}
 
 
