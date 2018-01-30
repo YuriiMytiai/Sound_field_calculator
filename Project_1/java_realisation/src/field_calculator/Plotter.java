@@ -5,7 +5,6 @@ import org.jzy3d.chart.AWTChart;
 import org.jzy3d.colors.Color;
 import org.jzy3d.colors.ColorMapper;
 import org.jzy3d.colors.colormaps.ColorMapGrayscale;
-import org.jzy3d.colors.colormaps.ColorMapRedAndGreen;
 import org.jzy3d.javafx.JavaFXChartFactory;
 import org.jzy3d.maths.BoundingBox3d;
 import org.jzy3d.maths.Coord3d;
@@ -14,9 +13,6 @@ import org.jzy3d.plot3d.primitives.axes.layout.renderers.IntegerTickRenderer;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 import org.jzy3d.plot3d.rendering.legends.colorbars.AWTColorbarLegend;
 import org.jzy3d.plot3d.rendering.view.ViewportMode;
-import org.jzy3d.plot3d.transform.Rotate;
-import org.jzy3d.plot3d.transform.Transform;
-import org.jzy3d.plot3d.transform.Translate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +64,7 @@ public class Plotter {
         return surface;
     }
 
-    public static ImageView plotAllSources(Area area, Shape surface) {
+    public static ImageView plotAllSourcesRectArea(RectangularArea area, Shape surface) {
         JavaFXChartFactory factory = new JavaFXChartFactory();
         Quality quality = Quality.Intermediate;
         AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
@@ -106,7 +102,7 @@ public class Plotter {
         return imageView;
     }
 
-    public static ImageView plotLightedSource(Area area, Shape surface, int sourceNum) {
+    public static ImageView plotLightedSourceRectArea(RectangularArea area, Shape surface, int sourceNum) {
         JavaFXChartFactory factory = new JavaFXChartFactory();
         Quality quality = Quality.Intermediate;
         AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");

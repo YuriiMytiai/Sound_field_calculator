@@ -20,7 +20,7 @@ import java.io.Serializable;
 public class SingleSource extends Source implements Serializable{
 
 	/*
-	Properties from super class Source
+	Properties from super class Source:
 
 	public int number;
 	public String name;

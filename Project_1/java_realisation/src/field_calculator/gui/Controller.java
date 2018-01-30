@@ -1,9 +1,6 @@
 package field_calculator.gui;
 
-import field_calculator.Area;
-import field_calculator.SingleSource;
-import field_calculator.SoundSource;
-import field_calculator.Source;
+import field_calculator.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -106,7 +103,7 @@ public class Controller extends Component {
             return;
         }
 
-        area = new Area(xSize, ySize, xStep, yStep);
+        area = new RectangularArea(xSize, ySize, xStep, yStep);
 
         ImageView imageView = area.plotSurface();
         chart1.getChildren().add(imageView);
@@ -418,7 +415,7 @@ public class Controller extends Component {
         int result = fileChooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             filename = fileChooser.getSelectedFile().getName();
-            if (filename == null) {
+            if (filename.equals("")) {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Date date = new Date();
                 filename = "Project " + dateFormat.format(date);
@@ -462,7 +459,10 @@ public class Controller extends Component {
             FileInputStream fileStream = new FileInputStream(areaFile);
             ObjectInputStream os = new ObjectInputStream(fileStream);
             Object firstObject = os.readObject();
-            area = (Area) firstObject;
+            Class fileClass = firstObject.getClass();
+            if(fileClass.toString().equals("class field_calculator.RectangularArea")) {
+                area = (RectangularArea) firstObject;
+            }
             os.close();
         } catch (Exception ex) {
             ex.printStackTrace();
