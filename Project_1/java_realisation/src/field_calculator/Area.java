@@ -25,8 +25,8 @@ public class Area implements Serializable {
 	public double[][] gridX;
 	public double[][] gridY;
 	public HashMap<Integer, Source> sources = new HashMap<Integer, Source>();
-	public double[][][] sumFieldAbs;
-	public double[][][] sumFieldPhase;
+	private double[][][] sumFieldAbs;
+	private double[][][] sumFieldPhase;
 	public static final double[] FREQS = {16, 20, 25, 31.5, 40, 50, 63, 80, 100, 125,
 			160, 200, 250, 315, 400, 500, 630, 800, 1e3, 1.25e3,
 			1.6e3, 2e3, 2.5e3, 3.15e3, 4e3, 5e3, 6.3e3, 8e3, 1e4, 1.25e4,

@@ -78,50 +78,9 @@ public class Plotter {
         double maxZPosition = 0;
         for (Integer key:area.sources.keySet()) {
             Source curSource = area.sources.get(key);
-
             if (curSource.position[2] > maxZPosition) {maxZPosition = curSource.position[2];}
 
-            double xMin = - curSource.soundSourceObj.getCentralPoint()[0];
-            double yMin = - curSource.soundSourceObj.getCentralPoint()[1];
-            double zMin = - curSource.soundSourceObj.getCentralPoint()[2];
-            double xMax = xMin + curSource.soundSourceObj.getSizes()[0];
-            double yMax = yMin + curSource.soundSourceObj.getSizes()[1];
-            double zMax = zMin + curSource.soundSourceObj.getSizes()[2];
-
-            BoundingBox3d bounds = new BoundingBox3d((float) xMin, (float) xMax, (float) yMin, (float) yMax, (float) zMin, (float) zMax);
-            Parallelepiped box = new Parallelepiped(bounds);
-
-            Color c1 = new Color(255, 0, 0);
-            Point p1 = new Point(new Coord3d(0,0,0), c1);
-            Color c2 = new Color(178, 255, 102);
-            Point p2 = new Point(new Coord3d(soundAxisLength,0,0), c2);
-            LineStrip sourceAxis = new LineStrip(p1, p2);
-
-            box.setColorMapper(new ColorMapper(new ColorMapRedAndGreen(), -5, 30, new Color(1f, 1, 1f, 0.35f)));
-            Transform transform = new Transform();
-            Rotate rotateTheta = new Rotate(-curSource.theta0, new Coord3d(0, curSource.position[1] + curSource.soundSourceObj.getCentralPoint()[1], 0));
-            transform.add(rotateTheta);
-            box.applyGeometryTransform(transform);
-            sourceAxis.applyGeometryTransform(transform);
-            transform = null;
-
-            transform = new Transform();
-            Rotate rotatePhi = new Rotate(-curSource.phi0, new Coord3d(0, 0, curSource.position[2] + curSource.soundSourceObj.getCentralPoint()[2]));
-            transform.add(rotatePhi);
-            box.applyGeometryTransform(transform);
-            sourceAxis.applyGeometryTransform(transform);
-
-            Transform transformShift = new Transform();
-            Translate shift = new Translate(new Coord3d(curSource.position[0], curSource.position[1], curSource.position[2]));
-            transformShift.add(shift);
-            box.applyGeometryTransform(transformShift);
-            sourceAxis.applyGeometryTransform(transformShift);
-            chart.getScene().getGraph().add(box);
-            chart.getScene().getGraph().add(sourceAxis);
-
-            rotateTheta = null;
-            rotatePhi = null;
-            transform = null;
+            chart = curSource.plotSource(chart, soundAxisLength, false);
         }
         BoundingBox3d bbox = new BoundingBox3d();
         bbox.setXmax((float) area.xSize);
@@ -160,52 +119,12 @@ public class Plotter {
 
             if (curSource.position[2] > maxZPosition) {maxZPosition = curSource.position[2];}
 
-            double xMin = - curSource.soundSourceObj.getCentralPoint()[0];
-            double yMin = - curSource.soundSourceObj.getCentralPoint()[1];
-            double zMin = - curSource.soundSourceObj.getCentralPoint()[2];
-            double xMax = xMin + curSource.soundSourceObj.getSizes()[0];
-            double yMax = yMin + curSource.soundSourceObj.getSizes()[1];
-            double zMax = zMin + curSource.soundSourceObj.getSizes()[2];
-
-            BoundingBox3d bounds = new BoundingBox3d((float) xMin, (float) xMax, (float) yMin, (float) yMax, (float) zMin, (float) zMax);
-            Parallelepiped box = new Parallelepiped(bounds);
-
-            Color c1 = new Color(255, 0, 0);
-            Point p1 = new Point(new Coord3d(0,0,0), c1);
-            Color c2 = new Color(178, 255, 102);
-            Point p2 = new Point(new Coord3d(soundAxisLength,0,0), c2);
-            LineStrip sourceAxis = new LineStrip(p1, p2);
-
             if(key == sourceNum) {
-                box.setColorMapper(new ColorMapper(new ColorMapGrayscale(), 0, 0, new Color(0, 0, 0, 0f)));
+                chart = curSource.plotSource(chart, soundAxisLength, true);
             } else {
-                box.setColorMapper(new ColorMapper(new ColorMapRedAndGreen(), -5, 30, new Color(1f, 1, 1f, 0.35f)));
+                chart = curSource.plotSource(chart, soundAxisLength, false);
             }
 
-            Transform transform = new Transform();
-            Rotate rotateTheta = new Rotate(-curSource.theta0, new Coord3d(0, curSource.position[1] + curSource.soundSourceObj.getCentralPoint()[1], 0));
-            transform.add(rotateTheta);
-            box.applyGeometryTransform(transform);
-            sourceAxis.applyGeometryTransform(transform);
-            transform = null;
-
-            transform = new Transform();
-            Rotate rotatePhi = new Rotate(-curSource.phi0, new Coord3d(0, 0, curSource.position[2] + curSource.soundSourceObj.getCentralPoint()[2]));
-            transform.add(rotatePhi);
-            box.applyGeometryTransform(transform);
-            sourceAxis.applyGeometryTransform(transform);
-
-            Transform transformShift = new Transform();
-            Translate shift = new Translate(new Coord3d(curSource.position[0], curSource.position[1], curSource.position[2]));
-            transformShift.add(shift);
-            box.applyGeometryTransform(transformShift);
-            sourceAxis.applyGeometryTransform(transformShift);
-            chart.getScene().getGraph().add(box);
-            chart.getScene().getGraph().add(sourceAxis);
-
-            rotateTheta = null;
-            rotatePhi = null;
-            transform = null;
         }
         BoundingBox3d bbox = new BoundingBox3d();
         bbox.setXmax((float) area.xSize);
@@ -260,4 +179,5 @@ public class Plotter {
         ImageView imageView = factory.bindImageView(chart);
         return imageView;
     }
+
 }

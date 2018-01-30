@@ -1,6 +1,7 @@
 package field_calculator.gui;
 
 import field_calculator.Area;
+import field_calculator.SingleSource;
 import field_calculator.SoundSource;
 import field_calculator.Source;
 import javafx.collections.FXCollections;
@@ -180,7 +181,8 @@ public class Controller extends Component {
             os.close();
 
             String name = number + "_" + soundSource.getName();
-            Source curSource = new Source(number, name, curPosition, soundSource);
+            // add Single source
+            SingleSource curSource = new SingleSource(number, name, curPosition, soundSource);
             curSource.tau0 = delay;
             curSource.phi0 = (int) phi;
             curSource.theta0 = (int) theta;
@@ -197,7 +199,7 @@ public class Controller extends Component {
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    ex.getLocalizedMessage(),
+                    ex.getMessage(),
                     "Add source error",
                     JOptionPane.ERROR_MESSAGE);
             return;
