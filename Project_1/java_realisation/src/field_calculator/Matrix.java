@@ -159,5 +159,26 @@ public class Matrix {
         return ans;
     }
 
-    
+    // return array ans[0] = maxValue, ans[1] = index(maxValue)i, ans[2] = index(maxValue)j
+    public static double[] maxValue(double[][] a) {
+        double maxV = a[0][0];
+        double idxI = 0;
+        double idxJ = 0;
+        double[] ans = new double[3];
+
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a[0].length; j++) {
+                if (a[i][j] > maxV) {
+                    maxV = a[i][j];
+                    idxI = i;
+                    idxJ = j;
+                }
+            }
+        }
+        ans[0] = maxV;
+        ans[1] = idxI;
+        ans[2] = idxJ;
+        return ans;
+    }
+
 }

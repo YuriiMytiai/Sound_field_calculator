@@ -132,18 +132,53 @@ public class InclinedArea extends Area implements Serializable {
     }
 
     public ImageView plotSingleSourceField(int freqIdx, int sourceNum) {
-        Shape surface = buildPreasureFieldShape(freqIdx, true, sourceNum);
+        Shape surface = buildPreasureFieldShape3D(freqIdx, true, sourceNum);
         ImageView imageView = Plotter.plotField(surface);
         return imageView;
     }
 
     public ImageView plotSummaryField(int freqIdx) {
-        Shape surface = buildPreasureFieldShape(freqIdx, false, -1);
+        Shape surface = buildPreasureFieldShape2D(freqIdx, false, -1);
         ImageView imageView = Plotter.plotField(surface);
         return imageView;
     }
 
-    private Shape buildPreasureFieldShape(int freqIdx, boolean isSingle, int sourceNum) {
+    private Shape buildPreasureFieldShape2D(int freqIdx, boolean isSingle, int sourceNum) {
+        double[][] x = gridX;
+        double[][] y = gridY;
+        double[][] pressure;
+        if(isSingle) {
+            pressure = sources.get(sourceNum).preasureAbs[freqIdx];
+        } else {
+            pressure = sumFieldAbs[freqIdx];
+        }
+
+        ColorMapper clmp = new ColorMapper(new ColorMapRainbowNoBorder(), Matrix.minValue(pressure)[0], Matrix.maxValue(pressure)[0], new Color(1,1,1,1f));
+
+        // Create the 3d object
+        List<Polygon> polygons = new ArrayList<>();
+        for (int i = 0; i < (x.length - 1); i++) {
+            for (int j = 0; j < (x[0].length - 1); j++) {
+                Polygon polygon = new Polygon();
+                polygon.add(new Point( new Coord3d(x[i][j], y[i][j], gridZ[i][j]), clmp.getColor(pressure[i][j]) ));
+                polygon.add(new Point( new Coord3d(x[i][j+1], y[i][j+1], gridZ[i][j+1]), clmp.getColor(pressure[i][j+1])));
+                polygon.add(new Point( new Coord3d(x[i+1][j+1], y[i+1][j+1], gridZ[i+1][j+1]), clmp.getColor(pressure[i+1][j+1])));
+                polygon.add(new Point( new Coord3d(x[i+1][j], y[i+1][j], gridZ[i+1][j]), clmp.getColor(pressure[i+1][j])));
+                polygons.add(polygon);
+            }
+        }
+
+        // Jzy3d
+        Shape surface = new Shape(polygons);
+
+        //surface.setColorMapper(new ColorMapper(new ColorMapRainbowNoBorder(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1,1,1,1f)));
+        surface.setWireframeDisplayed(false);
+        surface.setWireframeColor(Color.GRAY);
+
+        return surface;
+    }
+
+    private Shape buildPreasureFieldShape3D(int freqIdx, boolean isSingle, int sourceNum) {
         double[][] x = gridX;
         double[][] y = gridY;
         double[][] pressure;
@@ -174,7 +209,6 @@ public class InclinedArea extends Area implements Serializable {
 
         return surface;
     }
-
 
 }
 
