@@ -103,7 +103,8 @@ public class Controller extends Component {
             return;
         }
 
-        area = new RectangularArea(xSize, ySize, xStep, yStep);
+       // area = new RectangularArea(xSize, ySize, xStep, yStep);
+        area = new InclinedArea(xSize, ySize, xStep, yStep, 5);
 
         ImageView imageView = area.plotSurface();
         chart1.getChildren().add(imageView);

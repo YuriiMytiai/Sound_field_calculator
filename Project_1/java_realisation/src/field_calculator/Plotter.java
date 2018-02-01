@@ -64,7 +64,7 @@ public class Plotter {
         return surface;
     }
 
-    public static ImageView plotAllSourcesRectArea(RectangularArea area, Shape surface) {
+    public static ImageView plotAllSourcesRectArea(Area area, Shape surface) {
         JavaFXChartFactory factory = new JavaFXChartFactory();
         Quality quality = Quality.Intermediate;
         AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
@@ -102,7 +102,7 @@ public class Plotter {
         return imageView;
     }
 
-    public static ImageView plotLightedSourceRectArea(RectangularArea area, Shape surface, int sourceNum) {
+    public static ImageView plotLightedSourceRectArea(Area area, Shape surface, int sourceNum) {
         JavaFXChartFactory factory = new JavaFXChartFactory();
         Quality quality = Quality.Intermediate;
         AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
@@ -174,6 +174,28 @@ public class Plotter {
 
         ImageView imageView = factory.bindImageView(chart);
         return imageView;
+    }
+
+    public static Shape buildRectInclinedSurface(double[][] x, double[][] y, double[][] z) {
+        // Create the 3d object
+        List<Polygon> polygons = new ArrayList<>();
+        for (int i = 0; i < (x.length - 1); i++) {
+            for (int j = 0; j < (x[0].length - 1); j++) {
+                Polygon polygon = new Polygon();
+                polygon.add(new Point( new Coord3d(x[i][j], y[i][j], z[i][j]) ));
+                polygon.add(new Point( new Coord3d(x[i][j+1], y[i][j+1], z[i][j+1])));
+                polygon.add(new Point( new Coord3d(x[i+1][j+1], y[i+1][j+1], z[i+1][j+1])));
+                polygon.add(new Point( new Coord3d(x[i+1][j], y[i+1][j], z[i+1][j])));
+                polygons.add(polygon);
+            }
+        }
+
+        // Jzy3d
+        Shape surface = new Shape(polygons);
+        surface.setColorMapper(new ColorMapper(new ColorMapGrayscale(), -5, (z[z.length -1][z[0].length-1] + 5), new Color(1,1,1,1f)));
+        surface.setWireframeDisplayed(true);
+        surface.setWireframeColor(Color.GRAY);
+        return surface;
     }
 
 }
