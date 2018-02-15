@@ -1,9 +1,19 @@
 package field_calculator;
 
 import javafx.scene.image.ImageView;
+import org.apache.commons.math3.complex.Complex;
+import org.jzy3d.colors.Color;
+import org.jzy3d.colors.ColorMapper;
+import org.jzy3d.colors.colormaps.ColorMapRainbowNoBorder;
+import org.jzy3d.maths.Coord3d;
+import org.jzy3d.plot3d.primitives.Point;
+import org.jzy3d.plot3d.primitives.Polygon;
+import org.jzy3d.plot3d.primitives.Shape;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class Area implements Serializable{
     public double xSize;
@@ -34,7 +44,55 @@ public abstract class Area implements Serializable{
         //sourcesCounter++;
     }
 
-    public abstract void calcSummPreasure(int freqIdx);
+    public void calcSummPreasure(int freqIdx) {
+        if (sumFieldAbs == null) {
+            sumFieldAbs = new double[32][gridX.length][gridX[0].length];
+            sumFieldPhase = new double[32][gridX.length][gridX[0].length];
+        }
+
+
+        Complex[][] p = new Complex [gridX.length][gridX[0].length];
+        for(int i = 0; i < p.length; i++) {
+            for (int j = 0; j < p[0].length; j++) {
+                p[i][j] = new Complex(0,0);
+            }
+        }
+
+        for (Integer key: sources.keySet()) {
+
+            Source curSource = sources.get(key);
+
+            double[][] ro = Matrix.dotMultiply(P0, Matrix.pow(10, Matrix.dotMultiply(0.05, curSource.preasureAbs[freqIdx])));
+            double[][] phi = Matrix.dotMultiply(-1, curSource.preasurePhase[freqIdx]);
+
+            for (int i = 0; i < gridX.length; i++) {
+                for (int j = 0; j < gridX[0].length; j++) {
+                    double Re = ro[i][j] * Math.cos(phi[i][j]);
+                    double Im = ro[i][j] * Math.sin(phi[i][j]);
+                    Complex pCur = new Complex(Re, Im);
+                    p[i][j] = p[i][j].add(pCur);
+                }
+            }
+        }
+
+        double[][] absP = new double[gridX.length][gridX[0].length];
+        for (int i = 0; i < gridX.length; i++) {
+            for (int j = 0; j < gridX[0].length; j++) {
+                absP[i][j] = p[i][j].abs();
+            }
+        }
+
+        double[][] angP = new double[gridX.length][gridX[0].length];
+        for (int i = 0; i < gridX.length; i++) {
+            for (int j = 0; j < gridX[0].length; j++) {
+                angP[i][j] = p[i][j].getArgument();
+            }
+        }
+
+        double oneDivP0 = 1/P0;
+        sumFieldAbs[freqIdx] = Matrix.dotMultiply(20, Matrix.dotLog10(Matrix.dotMultiply(oneDivP0,absP)));
+        sumFieldPhase[freqIdx] = angP;
+    }
 
     public abstract ImageView plotSurface();
 
@@ -42,7 +100,82 @@ public abstract class Area implements Serializable{
 
     public abstract ImageView plotLightedSource(int sourceNum);
 
-    public abstract ImageView plotSingleSourceField(int freqIdx, int sourceNum);
+    public ImageView plotSingleSourceField(int freqIdx, int sourceNum) {
+        Shape surface = buildPreasureFieldShape3D(freqIdx, true, sourceNum);
+        ImageView imageView = Plotter.plotField(surface, "dB SPL");
+        return imageView;
+    }
 
-    public abstract ImageView plotSummaryField(int freqIdx);
+    public ImageView plotSummaryField(int freqIdx) {
+        Shape surface = buildPreasureFieldShape2D(freqIdx, false, -1);
+        ImageView imageView = Plotter.plotField(surface, "dB SPL");
+        return imageView;
+    }
+
+
+    private Shape buildPreasureFieldShape2D(int freqIdx, boolean isSingle, int sourceNum) {
+        double[][] pressure;
+
+        if(isSingle) {
+            pressure = sources.get(sourceNum).preasureAbs[freqIdx];
+        } else {
+            pressure = sumFieldAbs[freqIdx];
+        }
+
+        ColorMapper clmp = new ColorMapper(new ColorMapRainbowNoBorder(), Matrix.minValue(pressure)[0], Matrix.maxValue(pressure)[0], new Color(1,1,1,1f));
+
+        // Create the 3d object
+        List<Polygon> polygons = new ArrayList<>();
+        for (int i = 0; i < (gridX.length - 1); i++) {
+            for (int j = 0; j < (gridX[0].length - 1); j++) {
+                Polygon polygon = new Polygon();
+                polygon.add(new Point( new Coord3d(gridX[i][j], gridY[i][j], gridZ[i][j]), clmp.getColor(pressure[i][j]) ));
+                polygon.add(new Point( new Coord3d(gridX[i][j+1], gridY[i][j+1], gridZ[i][j+1]), clmp.getColor(pressure[i][j+1])));
+                polygon.add(new Point( new Coord3d(gridX[i+1][j+1], gridY[i+1][j+1], gridZ[i+1][j+1]), clmp.getColor(pressure[i+1][j+1])));
+                polygon.add(new Point( new Coord3d(gridX[i+1][j], gridY[i+1][j], gridZ[i+1][j]), clmp.getColor(pressure[i+1][j])));
+                polygons.add(polygon);
+            }
+        }
+
+        // Jzy3d
+        Shape surface = new Shape(polygons);
+
+        //surface.setColorMapper(new ColorMapper(new ColorMapRainbowNoBorder(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1,1,1,1f)));
+        surface.setWireframeDisplayed(false);
+        surface.setWireframeColor(Color.GRAY);
+
+        return surface;
+    }
+
+    private Shape buildPreasureFieldShape3D(int freqIdx, boolean isSingle, int sourceNum) {
+        double[][] x = gridX;
+        double[][] y = gridY;
+        double[][] pressure;
+        if(isSingle) {
+            pressure = sources.get(sourceNum).preasureAbs[freqIdx];
+        } else {
+            pressure = sumFieldAbs[freqIdx];
+        }
+
+        // Create the 3d object
+        List<Polygon> polygons = new ArrayList<>();
+        for (int i = 0; i < (x.length - 1); i++) {
+            for (int j = 0; j < (x[0].length - 1); j++) {
+                Polygon polygon = new Polygon();
+                polygon.add(new Point( new Coord3d(x[i][j], y[i][j], pressure[i][j]) ));
+                polygon.add(new Point( new Coord3d(x[i][j+1], y[i][j+1], pressure[i][j+1])));
+                polygon.add(new Point( new Coord3d(x[i+1][j+1], y[i+1][j+1], pressure[i+1][j+1])));
+                polygon.add(new Point( new Coord3d(x[i+1][j], y[i+1][j], pressure[i+1][j])));
+                polygons.add(polygon);
+            }
+        }
+
+        // Jzy3d
+        Shape surface = new Shape(polygons);
+        surface.setColorMapper(new ColorMapper(new ColorMapRainbowNoBorder(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1,1,1,1f)));
+        surface.setWireframeDisplayed(false);
+        surface.setWireframeColor(Color.GRAY);
+
+        return surface;
+    }
 }

@@ -13,6 +13,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.jzy3d.chart.AWTChart;
 import org.jzy3d.plot3d.primitives.axes.layout.IAxeLayout;
 import org.jzy3d.plot3d.rendering.view.View;
@@ -208,16 +210,20 @@ public class Controller extends Component {
     }
 
     public void prototypeButCallback(ActionEvent actionEvent) {
-        JFileChooser fileChooser = new JFileChooser();
-        FileNameExtensionFilter filterExtensions = new FileNameExtensionFilter("Sound Sources", "ser");
-        fileChooser.setFileFilter(filterExtensions);
-        String userDir = System.getProperty("user.dir");
-        fileChooser.setCurrentDirectory(new File(userDir));
 
-        int result = fileChooser.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            sourceFile = fileChooser.getSelectedFile();
-        }
+        Stage stage = new Stage();
+        stage.setTitle("Select SoundSource file");
+        FileChooser fileChooser = new FileChooser();
+
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("SoundSource object", "*.ser"));
+
+        String userDir = System.getProperty("user.dir");
+        fileChooser.setInitialDirectory(new File(userDir));
+
+        sourceFile = fileChooser.showOpenDialog(stage);
+        if (sourceFile == null) return;
+
         fileNameText.setText(sourceFile.getName());
     }
 
@@ -229,7 +235,7 @@ public class Controller extends Component {
             String sourceNum = field.split("\\_")[0];
             int freqIdx = freqChoise.getSelectionModel().getSelectedIndex();
 
-            area.sources.get(Integer.parseInt(sourceNum)).calcSourcePreasure(area.gridX, area.gridY, freqIdx);
+            area.sources.get(Integer.parseInt(sourceNum)).calcSourcePreasure(area.gridX, area.gridY, area.gridZ, freqIdx);
 
             chart3.getChildren().removeAll();
             ImageView imageView = area.plotSingleSourceField(freqIdx, Integer.parseInt(sourceNum));
@@ -249,7 +255,7 @@ public class Controller extends Component {
         int freqIdx = freqChoise.getSelectionModel().getSelectedIndex();
 
         for (Integer key: area.sources.keySet()) {
-            area.sources.get(key).calcSourcePreasure(area.gridX, area.gridY, freqIdx);
+            area.sources.get(key).calcSourcePreasure(area.gridX, area.gridY, area.gridZ, freqIdx);
         }
 
         area.calcSummPreasure(freqIdx);
@@ -360,17 +366,19 @@ public class Controller extends Component {
     }
 
     public void loadProjButtCallback(ActionEvent actionEvent) {
-        JFileChooser fileChooser = new JFileChooser();
-        FileNameExtensionFilter filterExtensions = new FileNameExtensionFilter("Area object", "ser");
-        fileChooser.setFileFilter(filterExtensions);
-        String userDir = System.getProperty("user.dir");
-        fileChooser.setCurrentDirectory(new File(userDir));
+        Stage stage = new Stage();
+        stage.setTitle("Select Project file");
+        FileChooser fileChooser = new FileChooser();
 
-        File areaFile = null;
-        int result = fileChooser.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            areaFile = fileChooser.getSelectedFile();
-        } else {return;}
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Area object", "*.ser"));
+
+        String userDir = System.getProperty("user.dir");
+        fileChooser.setInitialDirectory(new File(userDir));
+
+
+        File areaFile = fileChooser.showOpenDialog(stage);
+        if (areaFile == null) return;
 
         tryOpenAreaFile(areaFile);
         xSizeField.setText(Double.toString(area.xSize));

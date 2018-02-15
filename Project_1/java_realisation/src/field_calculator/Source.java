@@ -25,7 +25,65 @@ public abstract class Source implements Serializable {
         soundSourceObj = ssObj;
         name = name_;
     }
-    public abstract void calcSourcePreasure(double[][] gridX, double[][] gridY, int freqIdx);
+
+    public void calcSourcePreasure(double[][] gridX, double[][] gridY, double[][] gridZ, int freqIdx) {
+        if (preasureAbs == null) {
+            preasureAbs = new double[32][gridX.length][gridX[0].length];
+            preasurePhase = new double[32][gridX.length][gridX[0].length];
+        }
+        int numCols = gridX.length;
+        int numRows = gridX[0].length;
+
+        for (int xPoint = 0; xPoint < numCols; xPoint++) {
+            for (int yPoint = 0; yPoint < numRows; yPoint++) {
+                double[] preasure = calcPreasure(gridX[xPoint][yPoint], gridY[xPoint][yPoint], gridZ[xPoint][yPoint],
+                        freqIdx);
+                preasureAbs[freqIdx][xPoint][yPoint] = preasure[0];
+                preasurePhase[freqIdx][xPoint][yPoint] = preasure[1];
+            }
+        }
+    }
+
+    private double[] calcPreasure(double gridXP, double gridYP, double gridZP, int freqIdx) {
+        double[][] rotY = RotMatrix.getRotY(theta0);
+        double[][] rotZ = RotMatrix.getRotZ(phi0);
+
+        double xRS = gridXP - position[0];
+        double yRS = gridYP - position[1];
+        double zRS = gridZP - position[2];
+        double[] packedCoords = {xRS, yRS, zRS};
+
+        double[] rotatedZ = Matrix.multiply(rotZ, packedCoords);
+        double[] rotatedY = Matrix.multiply(rotY, rotatedZ);
+
+        xRS = rotatedY[0];
+        yRS = rotatedY[1];
+        zRS = rotatedY[2];
+
+        double r = Math.sqrt((xRS*xRS + yRS*yRS + zRS*zRS));
+        int theta = (int) Math.toDegrees(Math.round(Math.acos((zRS/r))));
+        int phi = (int) Math.toDegrees(Math.round(Math.atan2(yRS, xRS)));
+
+        if (phi > 359) {
+            phi -= 359;
+        }
+        if (phi < 0) {
+            phi += 359;
+        }
+
+        double alpha = 1.24e-11 * SoundSource.FREQS[freqIdx] * SoundSource.FREQS[freqIdx];
+
+        double rLog;
+        if (r > 2.1) {
+            rLog = r;
+        } else {rLog = 2.1;}
+
+        double A = soundSourceObj.getSensitivity()[freqIdx] + kAmp - 20 * Math.log10(rLog-1) + soundSourceObj.getAmplitudeRP(freqIdx)[theta][phi] - 20 * alpha * r * Math.log10(Math.exp(1));
+        double Psi = 2 * Math.PI * SoundSource.FREQS[freqIdx] * (r/c0 + tau0) + soundSourceObj.getPhaseRP(freqIdx)[theta][phi];
+
+        return new double[]{A, Psi};
+    }
+
 
     public abstract AWTChart plotSource(AWTChart chart, double soundAxisLength, boolean isHighlighted);
 

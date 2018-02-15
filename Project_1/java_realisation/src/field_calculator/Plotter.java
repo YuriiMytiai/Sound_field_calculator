@@ -146,7 +146,7 @@ public class Plotter {
         return imageView;
     }
 
-    public static ImageView plotField(Shape surface) {
+    public static ImageView plotField(Shape surface, String zLabel) {
         JavaFXChartFactory factory = new JavaFXChartFactory();
         Quality quality = Quality.Advanced;
         AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
@@ -163,7 +163,7 @@ public class Plotter {
         chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
         chart.getAxeLayout().setXAxeLabel("X");
         chart.getAxeLayout().setYAxeLabel("Y");
-        chart.getAxeLayout().setYAxeLabel("dB SPL");
+        chart.getAxeLayout().setYAxeLabel(zLabel);
         org.jzy3d.maths.Scale zScale = new org.jzy3d.maths.Scale(surface.getBounds().getZmin(), surface.getBounds().getZmax());
         chart.getView().setScaleZ(zScale);
         chart.getView().getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
