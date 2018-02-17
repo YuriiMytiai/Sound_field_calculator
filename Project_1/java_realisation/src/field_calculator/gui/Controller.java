@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.geometry.Pos;
 import javafx.scene.SubScene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -17,6 +18,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 
 import javax.swing.*;
 
@@ -122,6 +125,8 @@ public class Controller extends Component {
 
         chart2.getChildren().removeAll();
         chart3.getChildren().removeAll();
+
+        readyForSourcesNotification();
     }
 
     public void addSourceButCallback(ActionEvent actionEvent) {
@@ -430,6 +435,14 @@ public class Controller extends Component {
         }
     }
 
+    public void zAxisMouseEntered(MouseEvent mouseEvent) {
+        Notifications notif1 = Notifications.create();
+        notif1.title("Warning message");
+        notif1.text("This configuration is slower than 'SPL on Z axis'");
+        notif1.hideAfter(Duration.seconds(3));
+        notif1.position(Pos.CENTER);
+        notif1.show();
+    }
 
 
 
@@ -523,6 +536,15 @@ public class Controller extends Component {
         }
     }
 
+    private void readyForSourcesNotification() {
+        Notifications notif2 = Notifications.create();
+        notif2.title("Info message");
+        notif2.text("Ready to add sources. You can move to 'Sources' tab");
+        notif2.hideAfter(Duration.seconds(5));
+        notif2.position(Pos.CENTER);
+        notif2.show();
+    }
+
 
 
     private void createRectInclinedArea() {
@@ -559,5 +581,7 @@ public class Controller extends Component {
 
         area = new RectangularArea(xSize, ySize, xStep, yStep);
     }
+
+
 
 }

@@ -9,6 +9,7 @@ import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.Point;
 import org.jzy3d.plot3d.primitives.Polygon;
 import org.jzy3d.plot3d.primitives.Shape;
+import org.jzy3d.plot3d.rendering.legends.colorbars.AWTColorbarLegend;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -103,30 +104,36 @@ public abstract class Area implements Serializable{
     public ImageView plotSingleSourceField(int freqIdx, int sourceNum, boolean showSPLonZ) {
         Shape surface;
         String zLabel;
+        Shape surf2;
         if (showSPLonZ) {
             surface = buildPreasureFieldShape3D(freqIdx, true, sourceNum);
+            surf2 = surface;
             zLabel = "dB SPL";
         } else {
             surface = buildPreasureFieldShape2D(freqIdx, true, sourceNum);
+            surf2 = buildPreasureFieldShape3D(freqIdx, true, sourceNum);
             zLabel = "Z, m";
         }
 
-        ImageView imageView = Plotter.plotField(surface, zLabel);
+        ImageView imageView = Plotter.plotField(surface, zLabel, surf2);
         return imageView;
     }
 
     public ImageView plotSummaryField(int freqIdx, boolean showSPLonZ) {
         Shape surface;
         String zLabel;
+        Shape surf2;
         if (showSPLonZ) {
             surface = buildPreasureFieldShape3D(freqIdx, false, -1);
+            surf2 = surface;
             zLabel = "dB SPL";
         } else {
             surface = buildPreasureFieldShape2D(freqIdx, false, -1);
+            surf2 = buildPreasureFieldShape3D(freqIdx, false, -1);
             zLabel = "Z, m";
         }
 
-        ImageView imageView = Plotter.plotField(surface, zLabel);
+        ImageView imageView = Plotter.plotField(surface, zLabel, surf2);
         return imageView;
     }
 
@@ -161,6 +168,7 @@ public abstract class Area implements Serializable{
         //surface.setColorMapper(new ColorMapper(new ColorMapRainbowNoBorder(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1,1,1,1f)));
         surface.setWireframeDisplayed(false);
         surface.setWireframeColor(Color.GRAY);
+
 
         return surface;
     }

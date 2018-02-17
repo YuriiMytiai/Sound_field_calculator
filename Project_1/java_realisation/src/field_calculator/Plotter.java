@@ -9,6 +9,7 @@ import org.jzy3d.javafx.JavaFXChartFactory;
 import org.jzy3d.maths.BoundingBox3d;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.*;
+import org.jzy3d.plot3d.primitives.axes.layout.providers.ITickProvider;
 import org.jzy3d.plot3d.primitives.axes.layout.renderers.IntegerTickRenderer;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 import org.jzy3d.plot3d.rendering.legends.colorbars.AWTColorbarLegend;
@@ -146,12 +147,17 @@ public class Plotter {
         return imageView;
     }
 
-    public static ImageView plotField(Shape surface, String zLabel) {
+    public static ImageView plotField(Shape surface, String zLabel, Shape cbarSurf) {
         JavaFXChartFactory factory = new JavaFXChartFactory();
         Quality quality = Quality.Advanced;
         AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
 
-        AWTColorbarLegend cbar = new AWTColorbarLegend(surface, chart.getView().getAxe().getLayout());
+        JavaFXChartFactory factoryCbr = new JavaFXChartFactory();
+        Quality qualityCbr = Quality.Intermediate;
+        AWTChart chartCbr = (AWTChart) factory.newChart(quality, "offscreen");
+
+        AWTColorbarLegend cbar = new AWTColorbarLegend(cbarSurf, chartCbr.getView().getAxe().getLayout());
+
         surface.setLegend(cbar);
         surface.setLegendDisplayed(true); // opens a colorbar on the right part of the display
 
@@ -161,8 +167,8 @@ public class Plotter {
         chart.getAxeLayout().setXTickRenderer( new IntegerTickRenderer() );
         chart.getAxeLayout().setYTickRenderer( new IntegerTickRenderer() );
         chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
-        chart.getAxeLayout().setXAxeLabel("X");
-        chart.getAxeLayout().setYAxeLabel("Y");
+        chart.getAxeLayout().setXAxeLabel("X, m");
+        chart.getAxeLayout().setYAxeLabel("Y, m");
         chart.getAxeLayout().setYAxeLabel(zLabel);
         org.jzy3d.maths.Scale zScale = new org.jzy3d.maths.Scale(surface.getBounds().getZmin(), surface.getBounds().getZmax());
         chart.getView().setScaleZ(zScale);
@@ -170,7 +176,6 @@ public class Plotter {
         chart.addMouseCameraController();
         chart.getView().setMaximized(true);
 
-        //layout2d(chart);
 
         ImageView imageView = factory.bindImageView(chart);
         return imageView;

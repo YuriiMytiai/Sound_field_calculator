@@ -92,7 +92,7 @@
                         <Button fx:id="singleSourceCalcBut" layoutX="34.0" layoutY="173.0" mnemonicParsing="false" onAction="#singleSourceCalcButCallback" text="Single Source" />
                         <Button fx:id="sumFieldCalcBut" layoutX="30.0" layoutY="245.0" mnemonicParsing="false" onAction="#sumFieldCalcButCallback" text="Summary Filed" />
                         <ToggleButton fx:id="zAxisSPL" layoutX="34.0" layoutY="336.0" mnemonicParsing="false" onAction="#splOnZaxis" text="SPL on Z axis" />
-                        <ToggleButton fx:id="zAxisHeight" layoutX="29.0" layoutY="368.0" mnemonicParsing="false" onAction="#heightOnZaxis" text="Z size on Z axis" />
+                        <ToggleButton fx:id="zAxisHeight" layoutX="29.0" layoutY="368.0" mnemonicParsing="false" onAction="#heightOnZaxis" onMouseEntered="#zAxisMouseEntered" text="Z size on Z axis" />
                      </children>
                   </AnchorPane>
                </content>
