@@ -29,7 +29,7 @@
                         <Pane fx:id="chart1" layoutX="317.0" layoutY="54.0" prefHeight="402.0" prefWidth="484.0" AnchorPane.leftAnchor="317.0" AnchorPane.topAnchor="54.0" />
                         <Button fx:id="loadProjBut" layoutX="115.0" layoutY="54.0" mnemonicParsing="false" onAction="#loadProjButtCallback" text="Load Project" />
                         <Button fx:id="saveProjBut" layoutX="117.0" layoutY="370.0" mnemonicParsing="false" onAction="#saveProjButtCallback" prefHeight="25.0" prefWidth="82.0" text="Save Project" visible="false" />
-                        <Button fx:id="areaApplyBut" layoutX="124.0" layoutY="266.0" mnemonicParsing="false" onAction="#areaApplyButCallback" text="New Area" visible="false" />
+                        <Button fx:id="areaApplyBut" layoutX="176.0" layoutY="265.0" mnemonicParsing="false" onAction="#areaApplyButCallback" prefHeight="25.0" prefWidth="84.0" text="New Area" visible="false" />
                         <TextField fx:id="yStepField" layoutX="217.0" layoutY="219.0" prefHeight="25.0" prefWidth="40.0" visible="false" />
                         <TextField fx:id="ySizeField" layoutX="93.0" layoutY="219.0" prefHeight="25.0" prefWidth="40.0" visible="false" />
                         <TextField layoutX="217.0" layoutY="165.0" prefHeight="25.0" prefWidth="40.0" visible="false" fx:id="xStepField" />
@@ -39,6 +39,9 @@
                         <Label layoutX="175.0" layoutY="169.0" text="X Step" visible="false" fx:id="xStepLabel" />
                         <Label layoutX="55.0" layoutY="169.0" text="X Size" visible="false" fx:id="xSizeLabel" />
                         <Button fx:id="newProjBut" layoutX="116.0" layoutY="114.0" mnemonicParsing="false" onAction="#newProjButtCallback" text="New Project" />
+                        <ChoiceBox fx:id="areaTypeChooser" layoutX="70.0" layoutY="54.0" prefHeight="25.0" prefWidth="170.0" visible="false" />
+                        <Label fx:id="hSizeLabel" layoutX="55.0" layoutY="269.0" text="H max" visible="false" />
+                        <TextField fx:id="hSizeTextField" layoutX="93.0" layoutY="265.0" prefHeight="25.0" prefWidth="40.0" visible="false" />
                      </children>
                   </AnchorPane>
             </content>
@@ -79,7 +82,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-            <Tab text="Calculations">
+            <Tab fx:id="calclsTab" onSelectionChanged="#calculationsSelected" text="Calculations">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -88,6 +91,8 @@
                         <Label layoutX="50.0" layoutY="76.0" text="Frequency" />
                         <Button fx:id="singleSourceCalcBut" layoutX="34.0" layoutY="173.0" mnemonicParsing="false" onAction="#singleSourceCalcButCallback" text="Single Source" />
                         <Button fx:id="sumFieldCalcBut" layoutX="30.0" layoutY="245.0" mnemonicParsing="false" onAction="#sumFieldCalcButCallback" text="Summary Filed" />
+                        <ToggleButton fx:id="zAxisSPL" layoutX="34.0" layoutY="336.0" mnemonicParsing="false" onAction="#splOnZaxis" text="SPL on Z axis" />
+                        <ToggleButton fx:id="zAxisHeight" layoutX="29.0" layoutY="368.0" mnemonicParsing="false" onAction="#heightOnZaxis" text="Z size on Z axis" />
                      </children>
                   </AnchorPane>
                </content>

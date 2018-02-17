@@ -55,7 +55,6 @@ public class RectangularArea extends Area implements Serializable {
 		gridX = grids.get(0);
 		gridY = grids.get(1);
 		gridZ = new double[gridX.length][gridX[0].length];
-		Arrays.fill(gridZ, 0);
 	}
 
 	

@@ -100,15 +100,33 @@ public abstract class Area implements Serializable{
 
     public abstract ImageView plotLightedSource(int sourceNum);
 
-    public ImageView plotSingleSourceField(int freqIdx, int sourceNum) {
-        Shape surface = buildPreasureFieldShape3D(freqIdx, true, sourceNum);
-        ImageView imageView = Plotter.plotField(surface, "dB SPL");
+    public ImageView plotSingleSourceField(int freqIdx, int sourceNum, boolean showSPLonZ) {
+        Shape surface;
+        String zLabel;
+        if (showSPLonZ) {
+            surface = buildPreasureFieldShape3D(freqIdx, true, sourceNum);
+            zLabel = "dB SPL";
+        } else {
+            surface = buildPreasureFieldShape2D(freqIdx, true, sourceNum);
+            zLabel = "Z, m";
+        }
+
+        ImageView imageView = Plotter.plotField(surface, zLabel);
         return imageView;
     }
 
-    public ImageView plotSummaryField(int freqIdx) {
-        Shape surface = buildPreasureFieldShape2D(freqIdx, false, -1);
-        ImageView imageView = Plotter.plotField(surface, "dB SPL");
+    public ImageView plotSummaryField(int freqIdx, boolean showSPLonZ) {
+        Shape surface;
+        String zLabel;
+        if (showSPLonZ) {
+            surface = buildPreasureFieldShape3D(freqIdx, false, -1);
+            zLabel = "dB SPL";
+        } else {
+            surface = buildPreasureFieldShape2D(freqIdx, false, -1);
+            zLabel = "Z, m";
+        }
+
+        ImageView imageView = Plotter.plotField(surface, zLabel);
         return imageView;
     }
 
@@ -148,8 +166,6 @@ public abstract class Area implements Serializable{
     }
 
     private Shape buildPreasureFieldShape3D(int freqIdx, boolean isSingle, int sourceNum) {
-        double[][] x = gridX;
-        double[][] y = gridY;
         double[][] pressure;
         if(isSingle) {
             pressure = sources.get(sourceNum).preasureAbs[freqIdx];
@@ -159,13 +175,13 @@ public abstract class Area implements Serializable{
 
         // Create the 3d object
         List<Polygon> polygons = new ArrayList<>();
-        for (int i = 0; i < (x.length - 1); i++) {
-            for (int j = 0; j < (x[0].length - 1); j++) {
+        for (int i = 0; i < (gridX.length - 1); i++) {
+            for (int j = 0; j < (gridX[0].length - 1); j++) {
                 Polygon polygon = new Polygon();
-                polygon.add(new Point( new Coord3d(x[i][j], y[i][j], pressure[i][j]) ));
-                polygon.add(new Point( new Coord3d(x[i][j+1], y[i][j+1], pressure[i][j+1])));
-                polygon.add(new Point( new Coord3d(x[i+1][j+1], y[i+1][j+1], pressure[i+1][j+1])));
-                polygon.add(new Point( new Coord3d(x[i+1][j], y[i+1][j], pressure[i+1][j])));
+                polygon.add(new Point( new Coord3d(gridX[i][j], gridY[i][j], pressure[i][j]) ));
+                polygon.add(new Point( new Coord3d(gridX[i][j+1], gridY[i][j+1], pressure[i][j+1])));
+                polygon.add(new Point( new Coord3d(gridX[i+1][j+1], gridY[i+1][j+1], pressure[i+1][j+1])));
+                polygon.add(new Point( new Coord3d(gridX[i+1][j], gridY[i+1][j], pressure[i+1][j])));
                 polygons.add(polygon);
             }
         }

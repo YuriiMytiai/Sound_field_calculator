@@ -1,6 +1,8 @@
 package field_calculator.gui;
 
 import field_calculator.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,28 +17,21 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jzy3d.chart.AWTChart;
-import org.jzy3d.plot3d.primitives.axes.layout.IAxeLayout;
-import org.jzy3d.plot3d.rendering.view.View;
-import org.jzy3d.plot3d.rendering.view.ViewportMode;
-import org.jzy3d.plot3d.rendering.view.modes.ViewPositionMode;
+
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 import java.awt.*;
 import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 public class Controller extends Component {
-
 
     private Area area;
     private File sourceFile;
     int number = 1;
     private boolean loadedProject = false;
+    String[] areaTypes = { "Select area type", "Rectangular area", "Inclined rectangular area"};
 
     public Pane chart1;
     public TextField xSizeField;
@@ -51,6 +46,10 @@ public class Controller extends Component {
     public Button newProjBut;
     public Label xStepLabel;
     public Label xSizeLabel;
+    public Label hSizeLabel;
+    public TextField hSizeTextField;
+    public ChoiceBox areaTypeChooser;
+    final ObservableList<String> areasList = FXCollections.observableArrayList();
 
     public Tab selSourceTab;
     public Pane chart2;
@@ -78,13 +77,18 @@ public class Controller extends Component {
     public Label fileNameText;
     final ObservableList<String> listItems = FXCollections.observableArrayList();
     public Button applyModificationBut;
-    private boolean wasPressed = false;
+    private boolean wasPressed2Tab = false;
 
     public Pane chart3;
     public ChoiceBox freqChoise;
     public Button singleSourceCalcBut;
     public Button sumFieldCalcBut;
     final ObservableList<String> freqList = FXCollections.observableArrayList();
+    public ToggleButton zAxisSPL;
+    public ToggleButton zAxisHeight;
+    final ToggleGroup axisGroup = new ToggleGroup();
+    private boolean showSPLonZ = true;
+    private boolean wasPressed3Tab = false;
 
 
 
@@ -92,21 +96,14 @@ public class Controller extends Component {
 
     public void areaApplyButCallback(ActionEvent actionEvent) {
 
-        double xSize = Double.parseDouble(xSizeField.getText());
-        double ySize = Double.parseDouble(ySizeField.getText());
-        double xStep = Double.parseDouble(xStepField.getText());
-        double yStep = Double.parseDouble(yStepField.getText());
+        int areaTypeIdx = areaTypeChooser.getSelectionModel().getSelectedIndex();
+        switch (areaTypeIdx) {
+            case 1: createRectArea();
+                break;
+            case 2: createRectInclinedArea();
+                break;
 
-        if ((xSize <= 0) || (ySize <= 0) || (xStep <= 0) || (yStep <= 0) || (xStep >= xSize) || (yStep >= ySize)) {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    "Please, enter a valid numbers!",
-                    "Invalid values error",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
         }
-
-       // area = new RectangularArea(xSize, ySize, xStep, yStep);
-        area = new InclinedArea(xSize, ySize, xStep, yStep, 5);
 
         ImageView imageView = area.plotSurface();
         chart1.getChildren().add(imageView);
@@ -117,10 +114,15 @@ public class Controller extends Component {
         freqChoise.setValue(Double.toString(Area.FREQS[18]));
         freqChoise.setItems(freqList);
 
+        listItems.removeAll();
+        sourcesList.setItems(listItems);
+        number = 1;
+        plotSources();
+
+
         chart2.getChildren().removeAll();
         chart3.getChildren().removeAll();
     }
-
 
     public void addSourceButCallback(ActionEvent actionEvent) {
         addSourceGroupVisible(true);
@@ -238,7 +240,7 @@ public class Controller extends Component {
             area.sources.get(Integer.parseInt(sourceNum)).calcSourcePreasure(area.gridX, area.gridY, area.gridZ, freqIdx);
 
             chart3.getChildren().removeAll();
-            ImageView imageView = area.plotSingleSourceField(freqIdx, Integer.parseInt(sourceNum));
+            ImageView imageView = area.plotSingleSourceField(freqIdx, Integer.parseInt(sourceNum), showSPLonZ);
             // JavaFX
             chart3.getChildren().add(imageView);
 
@@ -262,57 +264,17 @@ public class Controller extends Component {
 
         chart3.getChildren().removeAll();
 
-        ImageView imageView = area.plotSummaryField(freqIdx);
+        ImageView imageView = area.plotSummaryField(freqIdx, showSPLonZ);
         // JavaFX
         chart3.getChildren().add(imageView);
     }
 
-    private void addSourceGroupVisible(boolean setVisibleValue) {
-        xSourceField.setVisible(setVisibleValue);
-        ySourceField.setVisible(setVisibleValue);
-        zSourceField.setVisible(setVisibleValue);
-        delaySourceField.setVisible(setVisibleValue);
-        phiSourceField.setVisible(setVisibleValue);
-        thetaSourceField.setVisible(setVisibleValue);
-        gainSourceField.setVisible(setVisibleValue);
-        prototypeBut.setVisible(setVisibleValue);
-        xText.setVisible(setVisibleValue);
-        yText.setVisible(setVisibleValue);
-        zText.setVisible(setVisibleValue);
-        delayText.setVisible(setVisibleValue);
-        phiText.setVisible(setVisibleValue);
-        thetaText.setVisible(setVisibleValue);
-        gainText.setVisible(setVisibleValue);
-        applySourceBut.setVisible(setVisibleValue);
-        fileNameText.setVisible(setVisibleValue);
-    }
-
-    private void resetFields() {
-        xSourceField.setText("0");
-        ySourceField.setText("0");
-        zSourceField.setText("0");
-        delaySourceField.setText("0");
-        phiSourceField.setText("0");
-        thetaSourceField.setText("0");
-        gainSourceField.setText("0");
-
-    }
-
-    private void plotSources() {
-        chart2.getChildren().removeAll();
-        ImageView imageView = area.plotSources();
-        // JavaFX
-        chart2.getChildren().add(imageView);
-    }
-
-
-
     public void refreshArea(Event event) {
 
-        if (!wasPressed && !loadedProject) {
+        if (!wasPressed2Tab && !loadedProject) {
             ImageView imageView = area.plotSurface();
             chart2.getChildren().add(imageView);
-            wasPressed = true;
+            wasPressed2Tab = true;
         }
     }
 
@@ -355,16 +317,6 @@ public class Controller extends Component {
         plotSources();
     }
 
-    private static void layout2d(AWTChart chart) {
-        View view = chart.getView();
-        view.setViewPositionMode(ViewPositionMode.TOP);
-        view.getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
-
-        IAxeLayout axe = chart.getAxeLayout();
-        axe.setZAxeLabelDisplayed(false);
-        axe.setTickLineDisplayed(false);
-    }
-
     public void loadProjButtCallback(ActionEvent actionEvent) {
         Stage stage = new Stage();
         stage.setTitle("Select Project file");
@@ -381,11 +333,7 @@ public class Controller extends Component {
         if (areaFile == null) return;
 
         tryOpenAreaFile(areaFile);
-        xSizeField.setText(Double.toString(area.xSize));
-        ySizeField.setText(Double.toString(area.ySize));
-        xStepField.setText(Double.toString(area.xStep));
-        yStepField.setText(Double.toString(area.xStep));
-        newAreaGroupVisible(true);
+
         areaApplyBut.setVisible(false);
 
         ImageView imageView = area.plotSurface();
@@ -412,43 +360,123 @@ public class Controller extends Component {
     }
 
     public void saveProjButtCallback(ActionEvent actionEvent) {
-        JFileChooser fileChooser = new JFileChooser();
-        FileNameExtensionFilter filterExtensions = new FileNameExtensionFilter("Serialized objects", "ser");
-        fileChooser.setFileFilter(filterExtensions);
+
+        Stage stage = new Stage();
+        stage.setTitle("Save Project file");
+        FileChooser fileChooser = new FileChooser();
+
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Area object", "*.ser"));
+
         String userDir = System.getProperty("user.dir");
-        fileChooser.setCurrentDirectory(new File(userDir));
+        fileChooser.setInitialDirectory(new File(userDir));
 
-        String filename = null;
-        String dir = null;
-        // Demonstrate "Save" dialog:
-        int result = fileChooser.showSaveDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            filename = fileChooser.getSelectedFile().getName();
-            if (filename.equals("")) {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                Date date = new Date();
-                filename = "Project " + dateFormat.format(date);
-            }
-            dir = fileChooser.getCurrentDirectory().toString();
-        }
-        if (result == JFileChooser.CANCEL_OPTION) {
-            return;
-        }
 
-        String fullFile = dir + '\\' + filename;
+        File areaFile = fileChooser.showSaveDialog(stage);
+        if (areaFile == null) return;
+
         try {
-            FileOutputStream fileStream = new FileOutputStream((fullFile + ".ser"));
+            FileOutputStream fileStream = new FileOutputStream(areaFile);
             ObjectOutputStream os = new ObjectOutputStream(fileStream);
             os.writeObject(area);
             os.close();
         } catch (Exception ex) {ex.printStackTrace();}
+
     }
 
     public void newProjButtCallback(ActionEvent actionEvent) {
         loadProjBut.setVisible(false);
-        newAreaGroupVisible(true);
-        saveProjBut.setVisible(true);
+
+        for (String areaType:areaTypes) {
+            areasList.add(areaType);
+        }
+        areaTypeChooser.setValue(areaTypes[0]);
+        areaTypeChooser.setItems(areasList);
+        areaTypeChooser.setVisible(true);
+
+        areaTypeChooser.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+
+                switch (newValue.intValue()) {
+                    case 1: {
+                        newAreaGroupVisible(true);
+                        hSizeTextField.setVisible(false);
+                        hSizeLabel.setVisible(false);
+                    }
+                        break;
+                    case 2: newAreaGroupVisible(true);
+                        break;
+                    default: return;
+                }
+
+                saveProjBut.setVisible(true);
+                newProjBut.setVisible(false);
+            }
+        });
+
         newProjBut.setVisible(false);
+
+    }
+
+    public void splOnZaxis(ActionEvent actionEvent) { showSPLonZ = true; }
+
+    public void heightOnZaxis(ActionEvent actionEvent) { showSPLonZ = false; }
+
+    public void calculationsSelected(Event event) {
+        if (!wasPressed3Tab) {
+            createZaxisToggleGroup();
+            wasPressed3Tab = true;
+        }
+    }
+
+
+
+
+
+
+    private void addSourceGroupVisible(boolean setVisibleValue) {
+        xSourceField.setVisible(setVisibleValue);
+        ySourceField.setVisible(setVisibleValue);
+        zSourceField.setVisible(setVisibleValue);
+        delaySourceField.setVisible(setVisibleValue);
+        phiSourceField.setVisible(setVisibleValue);
+        thetaSourceField.setVisible(setVisibleValue);
+        gainSourceField.setVisible(setVisibleValue);
+        prototypeBut.setVisible(setVisibleValue);
+        xText.setVisible(setVisibleValue);
+        yText.setVisible(setVisibleValue);
+        zText.setVisible(setVisibleValue);
+        delayText.setVisible(setVisibleValue);
+        phiText.setVisible(setVisibleValue);
+        thetaText.setVisible(setVisibleValue);
+        gainText.setVisible(setVisibleValue);
+        applySourceBut.setVisible(setVisibleValue);
+        fileNameText.setVisible(setVisibleValue);
+    }
+
+    private void resetFields() {
+        xSourceField.setText("0");
+        ySourceField.setText("0");
+        zSourceField.setText("0");
+        delaySourceField.setText("0");
+        phiSourceField.setText("0");
+        thetaSourceField.setText("0");
+        gainSourceField.setText("0");
+
+    }
+
+    private void plotSources() {
+        chart2.getChildren().removeAll();
+        ImageView imageView = area.plotSources();
+        // JavaFX
+        chart2.getChildren().add(imageView);
+    }
+
+    private void createZaxisToggleGroup() {
+        zAxisSPL.setToggleGroup(axisGroup);
+        zAxisSPL.setSelected(true);
+        zAxisHeight.setToggleGroup(axisGroup);
     }
 
     private void newAreaGroupVisible(boolean visible) {
@@ -461,6 +489,8 @@ public class Controller extends Component {
         yStepLabel.setVisible(visible);
         yStepField.setVisible(visible);
         areaApplyBut.setVisible(visible);
+        hSizeTextField.setVisible(visible);
+        hSizeLabel.setVisible(visible);
     }
 
     private void tryOpenAreaFile (File areaFile) {
@@ -471,10 +501,63 @@ public class Controller extends Component {
             Class fileClass = firstObject.getClass();
             if(fileClass.toString().equals("class field_calculator.RectangularArea")) {
                 area = (RectangularArea) firstObject;
+                xSizeField.setText(Double.toString(area.xSize));
+                ySizeField.setText(Double.toString(area.ySize));
+                xStepField.setText(Double.toString(area.xStep));
+                yStepField.setText(Double.toString(area.xStep));
+                newAreaGroupVisible(true);
+                hSizeLabel.setVisible(false);
+                hSizeTextField.setVisible(false);
+            } else if (fileClass.toString().equals("class field_calculator.InclinedArea")) {
+                area = (InclinedArea) firstObject;
+                xSizeField.setText(Double.toString(area.xSize));
+                ySizeField.setText(Double.toString(area.ySize));
+                xStepField.setText(Double.toString(area.xStep));
+                yStepField.setText(Double.toString(area.xStep));
+                hSizeTextField.setText(Double.toString(area.zSize));
+                newAreaGroupVisible(true);
             }
             os.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
+
+
+
+    private void createRectInclinedArea() {
+        double xSize = Double.parseDouble(xSizeField.getText());
+        double ySize = Double.parseDouble(ySizeField.getText());
+        double xStep = Double.parseDouble(xStepField.getText());
+        double yStep = Double.parseDouble(yStepField.getText());
+        double hMax = Double.parseDouble(hSizeTextField.getText());
+
+        if ((xSize <= 0) || (ySize <= 0) || (xStep <= 0) || (yStep <= 0) || (xStep >= xSize) || (yStep >= ySize) || (hMax <= 0)) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "Please, enter a valid numbers!",
+                    "Invalid values error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        area = new InclinedArea(xSize, ySize, xStep, yStep, hMax);
+    }
+
+    private void createRectArea() {
+        double xSize = Double.parseDouble(xSizeField.getText());
+        double ySize = Double.parseDouble(ySizeField.getText());
+        double xStep = Double.parseDouble(xStepField.getText());
+        double yStep = Double.parseDouble(yStepField.getText());
+
+        if ((xSize <= 0) || (ySize <= 0) || (xStep <= 0) || (yStep <= 0) || (xStep >= xSize) || (yStep >= ySize)) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "Please, enter a valid numbers!",
+                    "Invalid values error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        area = new RectangularArea(xSize, ySize, xStep, yStep);
+    }
+
 }
