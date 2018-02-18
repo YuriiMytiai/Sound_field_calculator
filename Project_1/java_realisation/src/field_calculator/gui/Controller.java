@@ -441,7 +441,8 @@ public class Controller extends Component {
         notif1.text("This configuration is slower than 'SPL on Z axis'");
         notif1.hideAfter(Duration.seconds(3));
         notif1.position(Pos.CENTER);
-        notif1.show();
+        notif1.owner(chart3);
+        notif1.showWarning();
     }
 
 
@@ -539,10 +540,11 @@ public class Controller extends Component {
     private void readyForSourcesNotification() {
         Notifications notif2 = Notifications.create();
         notif2.title("Info message");
-        notif2.text("Ready to add sources. You can move to 'Sources' tab");
-        notif2.hideAfter(Duration.seconds(5));
+        notif2.text(new StringBuilder("Ready to add sources. \n You can move to 'Sources' tab").toString());
+        notif2.hideAfter(Duration.seconds(4));
         notif2.position(Pos.CENTER);
-        notif2.show();
+        notif2.owner(chart1);
+        notif2.showInformation();
     }
 
 
@@ -581,7 +583,5 @@ public class Controller extends Component {
 
         area = new RectangularArea(xSize, ySize, xStep, yStep);
     }
-
-
 
 }
