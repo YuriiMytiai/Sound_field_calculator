@@ -1,21 +1,12 @@
 package field_calculator;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.scene.image.ImageView;
-import org.apache.commons.math3.complex.Complex;
-import org.jzy3d.colors.Color;
-import org.jzy3d.colors.ColorMapper;
-import org.jzy3d.colors.colormaps.ColorMapRainbowNoBorder;
-import org.jzy3d.maths.Coord3d;
-import org.jzy3d.plot3d.primitives.Point;
-import org.jzy3d.plot3d.primitives.Polygon;
 import org.jzy3d.plot3d.primitives.Shape;
 
-public class InclinedArea extends Area implements Serializable {
-	/*
+import java.util.ArrayList;
+
+public class CircusArea extends Area {
+    	/*
 	Properties from super class Area:
 
 	public double xSize;
@@ -29,9 +20,9 @@ public class InclinedArea extends Area implements Serializable {
 	private double[][][] sumFieldPhase;
 	*/
 
-    public InclinedArea(double xSize_, double ySize_, double xStep_, double yStep_, double hMax) {
-        xSize = xSize_;
-        ySize = ySize_;
+    public CircusArea(double rInner, double rOuter, double xStep_, double yStep_, double hMax) {
+        xSize = rOuter * 2;
+        ySize = rOuter * 2;
         xStep = xStep_;
         yStep = yStep_;
         zSize = hMax;
@@ -54,17 +45,39 @@ public class InclinedArea extends Area implements Serializable {
         ArrayList<double[][]> grids = SomeMath.meshgrid(xPoints, yPoints);
         gridX = grids.get(0);
         gridY = grids.get(1);
-        double kIncline = zSize / xSize;
-        gridZ = Matrix.dotMultiply(kIncline, gridX);
+        gridZ = makeZgrid(gridX, gridY, rInner, rOuter, hMax);
     }
 
+    private double[][] makeZgrid(double[][] gridX, double[][] gridY, double rInner, double rOuter, double hMax) {
+        double z0 = hMax * rOuter / rInner - hMax;
 
+        double[][] gridZ = new double[gridX.length][gridX[0].length];
+        double a1;
+        double a2;
+        double sum;
+        for (int i = 0; i < gridZ.length; i++) {
+            for (int j = 0; j < gridZ[0].length; j++) {
+                a1 = ((gridX[i][j]) - rOuter) * ((gridX[i][j]) - rOuter);
+                a2 = ((gridY[i][j]) - rOuter) * ((gridY[i][j]) - rOuter);
+                sum = a1 + a2;
+                if (sum > (rOuter * rOuter)) gridZ[i][j]  = hMax;
+                else {
+                    gridZ[i][j] = Math.sqrt(sum) / (rOuter / (hMax + z0)) - z0;
+                    if (gridZ[i][j] < 0) gridZ[i][j] = 0;
+                }
+            }
+        }
 
+        return gridZ;
+    }
+
+    @Override
     public ImageView plotSurface() {
         Shape surface = buildSurface();
         return Plotter.plotRectangularSurface(surface);
     }
 
+    @Override
     public ImageView plotSources() {
         Shape surface = buildSurface();
         ImageView imageView = Plotter.plotAllSourcesRectArea(this, surface);
@@ -80,10 +93,4 @@ public class InclinedArea extends Area implements Serializable {
     private Shape buildSurface() {
         return Plotter.buildRectInclinedSurface(gridX, gridY, gridZ);
     }
-
-
-
-
-
 }
-

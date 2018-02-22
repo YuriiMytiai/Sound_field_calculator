@@ -34,7 +34,7 @@ public class Controller extends Component {
     private File sourceFile;
     int number = 1;
     private boolean loadedProject = false;
-    String[] areaTypes = { "Select area type", "Rectangular area", "Inclined rectangular area"};
+    String[] areaTypes = { "Select area type", "Rectangular area", "Inclined rectangular area", "Circus area"};
 
     public Pane chart1;
     public TextField xSizeField;
@@ -104,6 +104,8 @@ public class Controller extends Component {
             case 1: createRectArea();
                 break;
             case 2: createRectInclinedArea();
+                break;
+            case 3: createCircusArea();
                 break;
 
         }
@@ -404,13 +406,11 @@ public class Controller extends Component {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 
                 switch (newValue.intValue()) {
-                    case 1: {
-                        newAreaGroupVisible(true);
-                        hSizeTextField.setVisible(false);
-                        hSizeLabel.setVisible(false);
-                    }
+                    case 1: showRectInclinedAreaTextFields();
                         break;
-                    case 2: newAreaGroupVisible(true);
+                    case 2: showRectAreaTextFields();
+                        break;
+                    case 3: showCircusAreaTextFields();
                         break;
                     default: return;
                 }
@@ -549,6 +549,18 @@ public class Controller extends Component {
 
 
 
+    private void showRectInclinedAreaTextFields() {
+        newAreaGroupVisible(true);
+        hSizeTextField.setVisible(false);
+        hSizeLabel.setVisible(false);
+
+        xSizeLabel.setText("X Size");
+        xSizeLabel.setLayoutX(55);
+
+        ySizeLabel.setText("Y Size");
+        ySizeLabel.setLayoutX(55);
+    }
+
     private void createRectInclinedArea() {
         double xSize = Double.parseDouble(xSizeField.getText());
         double ySize = Double.parseDouble(ySizeField.getText());
@@ -567,6 +579,15 @@ public class Controller extends Component {
         area = new InclinedArea(xSize, ySize, xStep, yStep, hMax);
     }
 
+    private void showRectAreaTextFields() {
+        newAreaGroupVisible(true);
+        xSizeLabel.setText("X Size");
+        xSizeLabel.setLayoutX(55);
+
+        ySizeLabel.setText("Y Size");
+        ySizeLabel.setLayoutX(55);
+    }
+
     private void createRectArea() {
         double xSize = Double.parseDouble(xSizeField.getText());
         double ySize = Double.parseDouble(ySizeField.getText());
@@ -582,6 +603,34 @@ public class Controller extends Component {
         }
 
         area = new RectangularArea(xSize, ySize, xStep, yStep);
+    }
+
+    private void showCircusAreaTextFields() {
+        newAreaGroupVisible(true);
+        xSizeLabel.setText("Inner radius");
+        xSizeLabel.setLayoutX(25);
+
+        ySizeLabel.setText("Outer radius");
+        ySizeLabel.setLayoutX(25);
+    }
+
+    private void createCircusArea() {
+        double rInner = Double.parseDouble(xSizeField.getText());
+        double rOuter = Double.parseDouble(ySizeField.getText());
+        double xStep = Double.parseDouble(xStepField.getText());
+        double yStep = Double.parseDouble(yStepField.getText());
+        double hMax = Double.parseDouble(hSizeTextField.getText());
+
+        if ((rInner <= 0) || (rOuter <= 0) || (xStep <= 0) || (yStep <= 0) || (xStep >= rInner) || (yStep >= rInner) ||
+                (hMax <= 0) || (rInner >= rOuter)) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "Please, enter a valid numbers!",
+                    "Invalid values error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        area = new CircusArea(rInner, rOuter, xStep, yStep, hMax);
     }
 
 }
