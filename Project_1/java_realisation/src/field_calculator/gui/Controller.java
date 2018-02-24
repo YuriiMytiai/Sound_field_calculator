@@ -579,6 +579,7 @@ public class Controller extends Component {
         area = new InclinedArea(xSize, ySize, xStep, yStep, hMax);
     }
 
+
     private void showRectAreaTextFields() {
         newAreaGroupVisible(true);
         xSizeLabel.setText("X Size");
@@ -604,6 +605,7 @@ public class Controller extends Component {
 
         area = new RectangularArea(xSize, ySize, xStep, yStep);
     }
+
 
     private void showCircusAreaTextFields() {
         newAreaGroupVisible(true);

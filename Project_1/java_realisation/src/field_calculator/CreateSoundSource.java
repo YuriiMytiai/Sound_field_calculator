@@ -11,7 +11,7 @@ public class CreateSoundSource {
 		//String name = args[0];
 		//String fileName = args[1];
 		String name = "MAG_Fly6_v2";
-		String fileName = "fly6.h5";
+		String fileName = "hornet12.h5";
 		CreateSoundSource newSrc = new CreateSoundSource();
 		newSrc.newFile(name, fileName);
 	}
@@ -43,8 +43,8 @@ public class CreateSoundSource {
 			newSource.setSizes(sizes);
 			newSource.setWeight(weight);
 
-			//newSource.plotAmplitudeRP(5000);
-			newSource.plotSensitivity();
+			newSource.plotAmplitudeRP(1000);
+			//newSource.plotSensitivity();
 			
 			FileOutputStream fileStream = new FileOutputStream((name + ".ser"));
 			ObjectOutputStream os = new ObjectOutputStream(fileStream);

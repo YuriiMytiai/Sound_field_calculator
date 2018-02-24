@@ -61,8 +61,8 @@ public abstract class Source implements Serializable {
         zRS = rotatedY[2];
 
         double r = Math.sqrt((xRS*xRS + yRS*yRS + zRS*zRS));
-        int theta = (int) Math.toDegrees(Math.round(Math.acos((zRS/r))));
-        int phi = (int) Math.toDegrees(Math.round(Math.atan2(yRS, xRS)));
+        int theta = (int) Math.round(Math.toDegrees(Math.acos((zRS/r))));
+        int phi = (int) Math.round(Math.toDegrees(Math.atan2(yRS, xRS)));
 
         if (phi > 359) {
             phi -= 359;
