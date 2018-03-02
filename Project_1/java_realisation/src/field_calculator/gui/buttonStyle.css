@@ -1,0 +1,107 @@
+
+
+.root{
+    -fx-background-color:  #ecb3ff;
+}
+
+.button1 {
+-fx-background-color:  #ceeec4;
+-fx-border-color:  #484642;
+-fx-border-radius:  4px;
+-fx-border-width:  1px;
+-fx-color: white;
+-fx-text-align: center;
+-fx-margin: 4px 2px;
+-fx-opacity: 1;
+}
+.button1:hover {-fx-background-color: #8bd874}
+.button1:pressed {
+-fx-background-color: #8bd874;
+-fx-translate-y: 2px;
+-fx-translate-x: -1px;
+}
+
+
+
+.button2 {
+-fx-background-color:  #ffe6b3;
+-fx-border-color:   #484642;
+-fx-border-radius:  4px;
+-fx-border-width:  1px;
+-fx-color: white;
+-fx-text-align: center;
+-fx-margin: 4px 2px;
+-fx-opacity: 1;
+}
+.button2:hover {-fx-background-color: #ffcc66}
+.button2:pressed {
+  -fx-background-color: #ffcc66;
+  -fx-translate-y: 2px;
+  -fx-translate-x: -1px;
+}
+
+.button3 {
+-fx-background-color:   #b3b3ff;
+-fx-border-color:   #484642;
+-fx-border-radius:  4px;
+-fx-border-width:  1px;
+-fx-color: white;
+-fx-text-align: center;
+-fx-margin: 4px 2px;
+-fx-opacity: 1;
+}
+.button3:hover {-fx-background-color: #8080ff}
+.button3:pressed {
+  -fx-background-color: #8080ff;
+  -fx-translate-y: 2px;
+  -fx-translate-x: -1px;
+}
+
+.list-cell{
+    -fx-background-color:  #ebd5f6;
+
+}
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-background-color: linear-gradient(#ff0066, #ff0066);
+    -fx-text-fill:  black;
+}
+
+.list-cell:even { /* <=== changed to even */
+    -fx-background-color: #f5ccff;
+}
+.list-cell:odd {
+    -fx-background-color: #ebd5f6;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #ffcc66;
+    -fx-text-fill: black;
+}
+
+
+.choice-box1 {
+  -fx-background-color: #ceeec4;
+  -fx-mark-color: #8bd874;
+}
+.choice-box1:hover { -fx-background-color: #8bd874; }
+.choice-box1 .context-menu { -fx-background-color: #ceeec4; }
+.choice-box1 .menu-item:focused {
+    -fx-background-color: #8bd874;
+    -fx-text-fill: black;
+}
+.choice-box1 > .label { -fx-text-fill: black; }
+
+
+.choice-box2 {
+  -fx-background-color: #b3b3ff;
+  -fx-mark-color: #8bd874;
+}
+.choice-box2:hover { -fx-background-color: #8080ff; }
+.choice-box2 .context-menu { -fx-background-color: #b3b3ff; }
+.choice-box2 .menu-item:focused {
+    -fx-background-color: #8080ff;
+    -fx-text-fill: black;
+}
+.choice-box2 > .label { -fx-text-fill: black; }
+
+

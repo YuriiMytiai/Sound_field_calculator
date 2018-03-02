@@ -21,7 +21,6 @@ import java.util.List;
 public class Plotter {
 
     public static ImageView plotRectangularSurface(Shape surface) {
-
         JavaFXChartFactory factory = new JavaFXChartFactory();
         Quality quality = Quality.Intermediate;
         AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
@@ -35,6 +34,9 @@ public class Plotter {
         chart.getAxeLayout().setYAxeLabel("Y");
         chart.getView().getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
         chart.addMouseCameraController();
+
+        chart.getAxeLayout().setMainColor(Color.BLACK);
+        chart.getView().setBackgroundColor(new Color(236, 179, 255));
 
         ImageView imageView = factory.bindImageView(chart);
 
@@ -98,6 +100,10 @@ public class Plotter {
         chart.getAxeLayout().setYTickRenderer( new IntegerTickRenderer() );
         chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
 
+
+        chart.getAxeLayout().setMainColor(Color.BLACK);
+        chart.getView().setBackgroundColor(new Color(236, 179, 255));
+
         ImageView imageView = factory.bindImageView(chart);
 
         return imageView;
@@ -142,6 +148,10 @@ public class Plotter {
         chart.getAxeLayout().setYTickRenderer( new IntegerTickRenderer() );
         chart.getAxeLayout().setZTickRenderer( new IntegerTickRenderer() );
 
+
+        chart.getAxeLayout().setMainColor(Color.BLACK);
+        chart.getView().setBackgroundColor(new Color(236, 179, 255));
+
         ImageView imageView = factory.bindImageView(chart);
 
         return imageView;
@@ -152,12 +162,10 @@ public class Plotter {
         Quality quality = Quality.Advanced;
         AWTChart chart = (AWTChart) factory.newChart(quality, "offscreen");
 
-        JavaFXChartFactory factoryCbr = new JavaFXChartFactory();
-        Quality qualityCbr = Quality.Intermediate;
         AWTChart chartCbr = (AWTChart) factory.newChart(quality, "offscreen");
 
         AWTColorbarLegend cbar = new AWTColorbarLegend(cbarSurf, chartCbr.getView().getAxe().getLayout());
-
+        cbar.setBackground(new Color(236, 179, 255));
         surface.setLegend(cbar);
         surface.setLegendDisplayed(true); // opens a colorbar on the right part of the display
 
@@ -175,6 +183,10 @@ public class Plotter {
         chart.getView().getCamera().setViewportMode(ViewportMode.STRETCH_TO_FILL);
         chart.addMouseCameraController();
         chart.getView().setMaximized(true);
+
+
+        chart.getAxeLayout().setMainColor(Color.BLACK);
+        chart.getView().setBackgroundColor(new Color(236, 179, 255));
 
 
         ImageView imageView = factory.bindImageView(chart);
