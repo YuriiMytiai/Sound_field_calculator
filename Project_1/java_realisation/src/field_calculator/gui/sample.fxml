@@ -13,15 +13,15 @@
       <RowConstraints />
    </rowConstraints>
    <children>
-      <TabPane id="mainPane" prefHeight="518.0" prefWidth="816.0" style="-fx-background-color: #ecb3ff;" tabClosingPolicy="UNAVAILABLE">
+      <TabPane id="mainPane" prefHeight="518.0" prefWidth="816.0" style="-fx-background-color: #ecb3ff;" styleClass="tab-pane" stylesheets="@buttonStyle.css" tabClosingPolicy="UNAVAILABLE">
         <tabs>
-          <Tab style="-fx-background-color: #ceeec4;" text="Area">
+          <Tab text="Area">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Pane fx:id="chart1" layoutX="317.0" layoutY="54.0" prefHeight="402.0" prefWidth="484.0" AnchorPane.leftAnchor="317.0" AnchorPane.topAnchor="54.0" />
+                        <Pane fx:id="chart1" layoutX="317.0" layoutY="54.0" prefHeight="402.0" prefWidth="483.0" AnchorPane.leftAnchor="317.0" AnchorPane.topAnchor="54.0" />
                         <Button fx:id="loadProjBut" layoutX="115.0" layoutY="54.0" mnemonicParsing="false" onAction="#loadProjButtCallback" styleClass="button1" stylesheets="@buttonStyle.css" text="Load Project" />
-                        <Button fx:id="saveProjBut" layoutX="117.0" layoutY="370.0" mnemonicParsing="false" onAction="#saveProjButtCallback" prefHeight="25.0" prefWidth="82.0" styleClass="button1" stylesheets="@buttonStyle.css" text="Save Project" visible="false" />
+                        <Button fx:id="saveProjBut" layoutX="113.0" layoutY="372.0" mnemonicParsing="false" onAction="#saveProjButtCallback" prefHeight="27.0" prefWidth="88.0" styleClass="button1" stylesheets="@buttonStyle.css" text="Save Project" visible="false" />
                         <Button fx:id="areaApplyBut" layoutX="176.0" layoutY="265.0" mnemonicParsing="false" onAction="#areaApplyButCallback" prefHeight="25.0" prefWidth="84.0" styleClass="button1" stylesheets="@buttonStyle.css" text="New Area" visible="false" />
                         <TextField fx:id="yStepField" layoutX="217.0" layoutY="219.0" prefHeight="25.0" prefWidth="40.0" style="-fx-background-color: #ebd5f6;" visible="false" />
                         <TextField fx:id="ySizeField" layoutX="93.0" layoutY="219.0" prefHeight="25.0" prefWidth="40.0" style="-fx-background-color: #ebd5f6;" visible="false" />
@@ -39,7 +39,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab fx:id="selSourceTab" onSelectionChanged="#refreshArea" style="-fx-background-color: #ffe6b3;" text="Sources">
+          <Tab fx:id="selSourceTab" onSelectionChanged="#refreshArea" text="Sources">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="508.0" prefWidth="843.0">
                      <children>
@@ -75,11 +75,11 @@
                   </AnchorPane>
             </content>
           </Tab>
-            <Tab fx:id="calclsTab" onSelectionChanged="#calculationsSelected" style="-fx-background-color: #b3b3ff;" text="Calculations">
+            <Tab fx:id="calclsTab" onSelectionChanged="#calculationsSelected" text="Calculations">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Pane fx:id="chart3" layoutX="156.0" layoutY="11.0" prefHeight="460.0" prefWidth="653.0" AnchorPane.leftAnchor="156.0" AnchorPane.topAnchor="11.0" />
+                        <Pane fx:id="chart3" layoutX="156.0" layoutY="11.0" prefHeight="460.0" prefWidth="660.0" AnchorPane.leftAnchor="156.0" AnchorPane.topAnchor="11.0" />
                         <ChoiceBox fx:id="freqChoise" layoutX="29.0" layoutY="103.0" maxWidth="300.0" prefHeight="25.0" prefWidth="97.0" styleClass="choice-box2" stylesheets="@buttonStyle.css" />
                         <Label layoutX="50.0" layoutY="76.0" text="Frequency" />
                         <Button fx:id="singleSourceCalcBut" layoutX="34.0" layoutY="173.0" mnemonicParsing="false" onAction="#singleSourceCalcButCallback" styleClass="button3" stylesheets="@buttonStyle.css" text="Single Source" />

@@ -1,5 +1,6 @@
 package field_calculator;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 import org.jzy3d.chart.AWTChart;
 import org.jzy3d.colors.Color;
@@ -8,6 +9,7 @@ import org.jzy3d.colors.colormaps.ColorMapGrayscale;
 import org.jzy3d.javafx.JavaFXChartFactory;
 import org.jzy3d.maths.BoundingBox3d;
 import org.jzy3d.maths.Coord3d;
+import org.jzy3d.maths.Dimension;
 import org.jzy3d.plot3d.primitives.*;
 import org.jzy3d.plot3d.primitives.axes.layout.providers.ITickProvider;
 import org.jzy3d.plot3d.primitives.axes.layout.renderers.IntegerTickRenderer;
@@ -187,8 +189,6 @@ public class Plotter {
 
         chart.getAxeLayout().setMainColor(Color.BLACK);
         chart.getView().setBackgroundColor(new Color(236, 179, 255));
-
-
         ImageView imageView = factory.bindImageView(chart);
         return imageView;
     }
