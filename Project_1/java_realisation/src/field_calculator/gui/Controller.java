@@ -439,7 +439,7 @@ public class Controller extends Component {
         Notifications notif1 = Notifications.create();
         notif1.title("Warning message");
         notif1.text("This configuration is slower than 'SPL on Z axis'");
-        notif1.hideAfter(Duration.seconds(3));
+        notif1.hideAfter(Duration.seconds(1.5));
         notif1.position(Pos.CENTER);
         notif1.owner(chart3);
         notif1.showWarning();
